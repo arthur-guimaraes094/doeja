@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #1A432B;
+  background-color: #FCECE7;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #FCECE7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Merriweather', serif;
+}
+
+.rounded-button {
+  @apply rounded-full px-6 py-2 transition-all duration-300;
+}
+
+.input-doeja {
+  @apply w-full px-4 py-3 rounded-full bg-gray-100 border-none focus:ring-2 focus:ring-doeja-secondary outline-none transition-all;
+}
+
+.card-doeja {
+  @apply bg-white rounded-2xl shadow-sm overflow-hidden;
+}
