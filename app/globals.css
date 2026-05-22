@@ -1,20 +1,30 @@
-/* Resets and Base CSS */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
-}
+@import "tailwindcss";
+@source "../components";
+@source ".";
 
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
+@theme {
+  --color-bg-color: var(--bg-color);
+  --color-header-bg: var(--header-bg);
+  --color-footer-bg: var(--footer-bg);
+  --color-accent-color: var(--accent-color);
+  --color-accent-hover: var(--accent-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-white: var(--text-white);
+  --color-nav-link-color: var(--nav-link-color);
+  --color-nav-link-hover: var(--nav-link-hover);
+  
+  --font-fredoka: var(--font-fredoka-next), sans-serif;
+  --font-lilita: var(--font-lilita-next), sans-serif;
+
+  --animate-sway: sway 5s ease-in-out infinite alternate;
+  --animate-float-woman: float-woman 6s ease-in-out infinite;
+  --animate-wave-arm: wave-arm 3s ease-in-out infinite alternate;
+  --animate-bounce-veggie: bounce-veggie 4s ease-in-out infinite;
+  --animate-bounce-veggie-alt: bounce-veggie 4.5s ease-in-out infinite alternate;
 }
 
 /* Theme A: Organic & Warm variables */
-body.theme-organic {
+.theme-organic {
   --bg-color: #FDEDE4;
   --header-bg: #A3C767;
   --footer-bg: #A3C767;
@@ -24,7 +34,7 @@ body.theme-organic {
   --text-white: #FFFFFF;
   --nav-link-color: #2D3A1A;
   --nav-link-hover: #1e2911;
-  --font-family: var(--font-fredoka), sans-serif;
+  --font-family: var(--font-fredoka-next), sans-serif;
   --border-style: none;
   --box-shadow-hero: 0 8px 30px rgba(45, 58, 26, 0.08);
   --box-shadow-btn: 0 4px 14px rgba(242, 145, 27, 0.4);
@@ -34,7 +44,7 @@ body.theme-organic {
 }
 
 /* Theme C: Retro Poster variables */
-body.theme-retro {
+.theme-retro {
   --bg-color: #FFF5D6;
   --header-bg: #82B342;
   --footer-bg: #82B342;
@@ -44,7 +54,7 @@ body.theme-retro {
   --text-white: #FFFFFF;
   --nav-link-color: #000000;
   --nav-link-hover: #000000;
-  --font-family: var(--font-lilita), var(--font-fredoka), sans-serif;
+  --font-family: var(--font-lilita-next), var(--font-fredoka-next), sans-serif;
   --border-style: 3px solid #000000;
   --box-shadow-hero: 6px 6px 0px #000000;
   --box-shadow-btn: 4px 4px 0px #000000;
@@ -53,247 +63,82 @@ body.theme-retro {
   --stroke-width: 3px;
 }
 
-/* Base Styles using variables */
-body {
-  background-color: var(--bg-color);
-  font-family: var(--font-family);
-  color: var(--text-primary);
+/* Resets and Base CSS */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    background-color: var(--bg-color);
+    font-family: var(--font-family);
+    color: var(--text-primary);
+  }
+
+  button, input, select, textarea {
+    font-family: inherit;
+  }
+
+  .ill-svg {
+    width: 100%;
+    height: auto;
+  }
 }
 
-/* Header & Navigation */
-.main-header {
-  background-color: var(--header-bg);
-  border-bottom: var(--border-style);
-  padding: 15px 0;
-  position: relative;
-  z-index: 10;
-}
-
-.nav-container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-text {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.header-logo-svg {
-  transition: transform 0.3s ease;
-}
-.logo:hover .header-logo-svg {
-  transform: rotate(-10deg) scale(1.1);
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-}
-
-.nav-link {
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--nav-link-color);
-  position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--text-primary);
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-.login-btn {
-  background-color: var(--accent-color);
-  color: var(--text-white);
+/* Custom visual attributes not easily represented as generic Tailwind v4 utility values */
+.border-project-style {
   border: var(--border-style);
-  border-radius: var(--border-radius-btn);
-  padding: 10px 24px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
+}
+
+.border-t-project-style {
+  border-top: var(--border-style);
+}
+
+.border-b-project-style {
+  border-bottom: var(--border-style);
+}
+
+.shadow-project-hero {
+  box-shadow: var(--box-shadow-hero);
+}
+
+.shadow-project-btn {
   box-shadow: var(--box-shadow-btn);
 }
 
-.login-btn:hover {
-  background-color: var(--accent-hover);
-  transform: translateY(-2px);
+.radius-project-btn {
+  border-radius: var(--border-radius-btn);
 }
 
-.login-btn:active {
-  transform: translateY(0);
-}
-
-/* Hero Section */
-.hero-section {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  padding: 40px 0;
-}
-
-.hero-container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-.center-content {
-  flex: 1;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 30px;
-}
-
-.hero-title {
-  font-size: 32px;
-  line-height: 1.4;
-  color: var(--text-primary);
-  font-weight: bold;
-}
-
+/* default highlights & illustration shadows */
 .highlight-doe {
   color: #1a6b32; /* Organic green */
 }
-body.theme-retro .highlight-doe {
-  color: #82B342; /* Retro green */
-  -webkit-text-stroke: 1px #000000;
-}
-
 .highlight-ja {
   color: var(--accent-color);
 }
-body.theme-retro .highlight-ja {
-  -webkit-text-stroke: 1px #000000;
-}
-
-.center-logo-wrapper {
-  margin-top: 15px;
-  padding: 15px;
-  border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
-  box-shadow: var(--box-shadow-hero);
-  border: var(--border-style);
-}
-
-.hands-svg {
-  width: 180px;
-  height: 180px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-.hands-svg:hover {
-  transform: rotate(5deg) scale(1.05);
-}
 
 .illustration-wrapper {
-  width: 250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   filter: drop-shadow(0px 8px 16px rgba(45, 58, 26, 0.05));
 }
-body.theme-retro .illustration-wrapper {
+.theme-retro .illustration-wrapper {
   filter: none;
 }
 
-.ill-svg {
-  width: 100%;
-  height: auto;
+/* webkit text strokes for retro theme headers */
+.theme-retro .highlight-doe {
+  color: #82B342;
+  -webkit-text-stroke: 1px #000000;
 }
-
-/* Theme Toggle Button */
-.theme-toggle-btn {
-  position: fixed;
-  top: 95px;
-  right: 20px;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background-color: var(--accent-color);
-  color: var(--text-white);
-  border: var(--border-style);
-  border-radius: var(--border-radius-btn);
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: var(--box-shadow-btn);
-}
-
-.theme-toggle-btn:hover {
-  background-color: var(--accent-hover);
-  transform: scale(1.05);
-}
-
-/* Footer & Vegetables */
-.main-footer {
-  background-color: var(--footer-bg);
-  border-top: var(--border-style);
-  height: 80px;
-  position: relative;
-  margin-top: auto;
-}
-
-.footer-decorations {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  pointer-events: none;
-}
-
-.decor-eggplant {
-  position: absolute;
-  bottom: 10px;
-  left: 5%;
-  pointer-events: auto;
-  transition: transform 0.3s ease;
-}
-.decor-eggplant:hover {
-  transform: scale(1.1) rotate(-5deg);
-}
-
-.decor-tomato {
-  position: absolute;
-  bottom: 10px;
-  right: 5%;
-  pointer-events: auto;
-  transition: transform 0.3s ease;
-}
-.decor-tomato:hover {
-  transform: scale(1.1) rotate(5deg);
+.theme-retro .highlight-ja {
+  -webkit-text-stroke: 1px #000000;
 }
 
 /* Animation classes for SVG characters (Organic Mode Only) */
@@ -319,11 +164,11 @@ body.theme-retro .illustration-wrapper {
   animation: bounce-veggie 4.5s ease-in-out infinite alternate;
 }
 
-/* Retro Shadow Modifications */
-body.theme-retro .decor-eggplant svg,
-body.theme-retro .decor-tomato svg,
-body.theme-retro #svg-daisy,
-body.theme-retro #svg-woman {
+/* Retro Shadow Modifications for SVGs */
+.theme-retro .decor-eggplant svg,
+.theme-retro .decor-tomato svg,
+.theme-retro #svg-daisy,
+.theme-retro #svg-woman {
   filter: drop-shadow(4px 4px 0px #000000);
 }
 
@@ -346,49 +191,4 @@ body.theme-retro #svg-woman {
 @keyframes bounce-veggie {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
-}
-
-/* Responsive Rules (Adapt & Stack) */
-@media (max-width: 1024px) {
-  .illustration-wrapper {
-    width: 180px;
-  }
-  .hero-title {
-    font-size: 26px;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-container {
-    flex-direction: column;
-    padding: 30px 0;
-  }
-  .illustration-wrapper {
-    width: 160px;
-  }
-  .left-ill {
-    order: 2;
-  }
-  .center-content {
-    order: 1;
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  .right-ill {
-    order: 3;
-  }
-  .nav-menu {
-    display: none; /* Simplifies menu on small mobile screens */
-  }
-  .theme-toggle-btn {
-    top: auto;
-    bottom: 90px;
-    right: 15px;
-  }
-  .decor-eggplant {
-    left: 2%;
-  }
-  .decor-tomato {
-    right: 2%;
-  }
 }
