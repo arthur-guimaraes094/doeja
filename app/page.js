@@ -21,8 +21,13 @@ export default function Home() {
 
   // Update body class and localStorage whenever theme changes
   useEffect(() => {
-    document.body.className = `theme-organic theme-retro`; // clear or set class
-    document.body.className = theme;
+    if (theme === "theme-organic") {
+      document.body.classList.add("theme-organic");
+      document.body.classList.remove("theme-retro");
+    } else {
+      document.body.classList.add("theme-retro");
+      document.body.classList.remove("theme-organic");
+    }
     localStorage.setItem("doeja-theme", theme);
   }, [theme]);
 
