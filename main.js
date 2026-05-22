@@ -29,9 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Periodic blinking interaction for cute veggies
+  // Periodic blinking interaction for cute veggies and flower
   setupVeggieBlink('svg-eggplant', '.eye');
   setupVeggieBlink('svg-tomato', '.eye');
+  setupVeggieBlink('svg-daisy', '.eye');
 
   function setupVeggieBlink(svgId, eyeSelector) {
     setInterval(() => {
@@ -39,23 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!svg) return;
       const eyes = svg.querySelectorAll(eyeSelector);
       eyes.forEach(eye => {
-        const originalY = eye.getAttribute('ry') || eye.getAttribute('r');
-        const isRy = eye.hasAttribute('ry');
-        
-        // Blink by scaling vertical radius down
-        if (isRy) {
-          eye.setAttribute('ry', '0.5');
-        } else {
-          // If it is regular circle, we can switch to ellipse or mock it by scaling height or changing r
-          eye.setAttribute('r', '0.5');
-        }
-        
+        const originalRy = eye.getAttribute('ry');
+        eye.setAttribute('ry', '0.5'); // blink
         setTimeout(() => {
-          if (isRy) {
-            eye.setAttribute('ry', originalY);
-          } else {
-            eye.setAttribute('r', originalY);
-          }
+          eye.setAttribute('ry', originalRy);
         }, 150);
       });
     }, 3000 + Math.random() * 4000);
