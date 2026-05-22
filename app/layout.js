@@ -1,4 +1,5 @@
 import { Fredoka, Lilita_One } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR" className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
       <body>
         {children}
+        <Analytics />
       </body>
     </html>
   );
