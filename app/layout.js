@@ -1,0 +1,29 @@
+import { Fredoka, Lilita_One } from "next/font/google";
+import "./globals.css";
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-fredoka",
+});
+
+const lilitaOne = Lilita_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-lilita",
+});
+
+export const metadata = {
+  title: "DoeJÁ - Conectando doadores de alimentos a ONGs",
+  description: "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="pt-BR">
+      <body className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
+        {children}
+      </body>
+    </html>
+  );
+}
