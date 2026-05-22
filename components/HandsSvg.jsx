@@ -2,7 +2,7 @@ import React from "react";
 
 export default function HandsSvg() {
   return (
-    <svg id="svg-hands" className="hands-svg" viewBox="0 0 200 200">
+    <svg id="svg-hands" className="w-[180px] h-[180px] cursor-pointer transition-transform duration-300 hover:rotate-5 hover:scale-105" viewBox="0 0 200 200">
       {/* Green Circle Frame */}
       <circle 
         cx="100" 
