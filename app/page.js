@@ -13,7 +13,10 @@ export default function Home() {
   // Load theme from localStorage on client-side mount
   useEffect(() => {
     const savedTheme = localStorage.getItem("doeja-theme") || "theme-organic";
-    setTheme(savedTheme);
+    const handle = requestAnimationFrame(() => {
+      setTheme(savedTheme);
+    });
+    return () => cancelAnimationFrame(handle);
   }, []);
 
   // Update body class and localStorage whenever theme changes
