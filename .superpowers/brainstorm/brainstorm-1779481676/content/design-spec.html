@@ -1,0 +1,69 @@
+<h2>Proposta de Design: Landing Page DoeJÁ com Toggles de Tema</h2>
+<p class="subtitle">Apresentação da arquitetura e recursos visuais para aprovação.</p>
+
+<div class="mockup" style="background: #FDEDE4; color: #2D3A1A; border: 2px solid #A3C767; border-radius: 16px; overflow: hidden; font-family: 'Fredoka', sans-serif;">
+  <div class="mockup-header" style="background: #A3C767; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+    <span>Protótipo DoeJÁ (Modo de Tema Ativo)</span>
+    <span style="background: #F2911B; font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; border: 1px solid white;">Alternar Tema (A ⇄ C)</span>
+  </div>
+  
+  <div class="mockup-body" style="padding: 30px; text-align: center; position: relative;">
+    <!-- Top Nav Mock -->
+    <div style="background: rgba(163, 199, 103, 0.2); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <div style="font-weight: bold; font-size: 14px; color: #1a6b32;">🍲 DoeJÁ</div>
+      <div style="display: flex; gap: 15px; font-size: 11px; font-weight: bold;">
+        <span>Doações</span>
+        <span>ONGs</span>
+        <span>Seja um parceiro</span>
+      </div>
+      <div style="background: #F2911B; width: 45px; height: 18px; border-radius: 9px; font-size: 9px; line-height: 18px; color: white; font-weight: bold;">Login</div>
+    </div>
+
+    <!-- Center Hero -->
+    <div style="max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+      <p style="font-weight: bold; font-size: 15px; line-height: 1.4; color: #2D3A1A;">
+        Seu gesto pode mudar histórias. <br>
+        <span style="color: #1a6b32; font-weight: 900;">Doe</span><span style="color: #F2911B; font-weight: 900;">JÁ</span> e leve mais do que alimento, leve cuidado e esperança.
+      </p>
+      
+      <!-- Central Logo hands mock -->
+      <div style="border: 2px dashed #A3C767; width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; background: white;">
+        <span style="font-size: 20px;">🤝</span>
+        <strong>Logo Central</strong>
+        <span style="font-size: 8px; color: #666;">(Mãos Cruzadas)</span>
+      </div>
+    </div>
+
+    <!-- SVG Side Elements Layout -->
+    <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px; font-size: 11px;">
+      <div style="text-align: left; opacity: 0.85;">
+        <span style="font-size: 24px; display: block; text-align: center;">🌼</span>
+        Margarida Feliz<br>(Swaying animation)
+      </div>
+      <div style="text-align: right; opacity: 0.85;">
+        <span style="font-size: 24px; display: block; text-align: center;">🙋‍♀️</span>
+        Mulher Celebrando<br>(Arm wave animation)
+      </div>
+    </div>
+
+    <!-- Vegetables at bottom -->
+    <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 20px; font-size: 11px; padding: 0 10px;">
+      <div>🍆 Berinjela Fofa</div>
+      <div>🍅 Tomate Fofo</div>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top: 25px;">
+  <div class="pros">
+    <h4>Detalhes Técnicos Propostos</h4>
+    <ul>
+      <li><strong>Mecanismo de Temas:</strong> Utilização de variáveis CSS (`--bg-primary`, `--accent-color`, `--border-style`, etc.) no `:root` e na classe `.theme-retro`. Um pequeno script JS fará a transição suave das variáveis ao alternar os estilos.</li>
+      <li><strong>Ilustrações Customizadas:</strong> Todo o design visual da margarida, berinjela, tomate, mãos unidas e boneca será construído em SVG inline responsivo. Isso evita carregamento lento e distorções de pixels.</li>
+      <li><strong>Animações:</strong> `@keyframes` em CSS para animações de pulso, balanço (sway) e piscar de olhos, ativadas por padrão na versão Orgânica e desativadas ou simplificadas na versão Retro para fidelidade estética de cada modo.</li>
+      <li><strong>Estrutura de Arquivos:</strong> Um único arquivo `index.html` contendo a marcação e o JS minimalista, e um `index.css` contendo o sistema de design completo (cores, fontes e classes de tema).</li>
+    </ul>
+  </div>
+</div>
+
+<p style="margin-top: 20px; font-weight: bold;">O que acha dessa proposta com alternador de temas dinâmico para testar as duas abordagens? Podemos prosseguir para documentar a especificação de design?</p>
