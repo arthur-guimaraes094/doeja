@@ -19,14 +19,15 @@ export default function Home() {
     return () => cancelAnimationFrame(handle);
   }, []);
 
-  // Update body class and localStorage whenever theme changes
+  // Update html class and localStorage whenever theme changes
   useEffect(() => {
+    const root = document.documentElement;
     if (theme === "theme-organic") {
-      document.body.classList.add("theme-organic");
-      document.body.classList.remove("theme-retro");
+      root.classList.add("theme-organic");
+      root.classList.remove("theme-retro");
     } else {
-      document.body.classList.add("theme-retro");
-      document.body.classList.remove("theme-organic");
+      root.classList.add("theme-retro");
+      root.classList.remove("theme-organic");
     }
     localStorage.setItem("doeja-theme", theme);
   }, [theme]);

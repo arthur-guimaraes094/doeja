@@ -4,13 +4,13 @@ import "./globals.css";
 const fredoka = Fredoka({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-fredoka",
+  variable: "--font-fredoka-next",
 });
 
 const lilitaOne = Lilita_One({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-lilita",
+  variable: "--font-lilita-next",
 });
 
 export const metadata = {
@@ -20,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR">
-      <body className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
+    <html lang="pt-BR" className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
+      <body>
         {children}
       </body>
     </html>
