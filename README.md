@@ -82,19 +82,19 @@ Aqui está um mapa resumido do projeto para você saber exatamente onde encontra
 ```
 doeja/
 ├── app/                    # Páginas, layouts e estilos globais (Next.js App Router)
-│   ├── globals.css         # Importações do Tailwind v4, customizações e variáveis de tema
+│   ├── globals.css         # Importações do Tailwind v4 e estilos globais
 │   ├── layout.tsx          # Layout base comum a todas as páginas (Fontes e metadados SEO)
 │   └── page.tsx            # A página inicial (Landing Page principal do projeto)
-├── components/             # Componentes visuais reutilizáveis (Header, Footer, SVGs)
-│   ├── DaisySvg.tsx        # Animação SVG inline da Margarida
+├── components/             # Componentes visuais reutilizáveis (Header, Footer, Canvas)
+│   ├── FloatingVegetables2D.tsx # Fundo de vegetais animados no Canvas
 │   ├── Header.tsx          # Menu de navegação superior
-│   └── ...                 # Outros elementos visuais isolados
-├── hooks/                  # Hooks customizados (lógicas separadas da interface)
-│   └── useTheme.ts         # Controla e persiste a mudança de tema (Orgânico / Retro)
+│   └── Footer.tsx          # Rodapé da página
 ├── lib/                    # Códigos utilitários globais
 │   └── utils/
-│       └── cn.ts           # Função auxiliar para mesclar classes de estilo
-├── docs/                   # Documentações de design e especificações
+│       ├── cn.ts           # Função auxiliar para mesclar classes de estilo
+│       └── cn.test.ts      # Testes unitários da função auxiliar
+├── docs/                   # Diretrizes, especificações e documentações
+│   └── DEVELOPER_GUIDELINES.md # Guia didático de desenvolvimento para iniciantes
 ├── tsconfig.json           # Configurações do TypeScript (Strict Mode habilitado!)
 ├── vitest.config.ts        # Configurações de execução de testes com Vitest
 └── package.json            # Scripts de execução e dependências instaladas
@@ -125,35 +125,11 @@ Qualquer elemento que puder ser reutilizado em mais de uma página (ex: Botões 
 *   **Atenção ao importar**: Você pode usar o alias `@/components` ou importar de forma relativa `../components/MeuComponente`.
 *   Dê preferência a nomes de componentes em `PascalCase` (ex: `Header.tsx`, `HandsSvg.tsx`).
 
-### C. Estilização: Tailwind CSS v4 e Temas Dinâmicos
-Nós usamos **Tailwind CSS v4** para construir e estilizar a interface. Adicionalmente, o DoeJÁ possui dois temas visuais completos:
-1.  **Orgânico (`theme-organic`)**: Cores quentes, bordas arredondadas e ilustrações sem borda preta.
-2.  **Retro Pôster (`theme-retro`)**: Cores contrastantes estilo jornal impresso, bordas pretas grossas e elementos quadrados.
+### C. Estilização: Tailwind CSS v4
+Nós usamos **Tailwind CSS v4** para construir e estilizar a interface. O design adotado é unificado e focado na estética orgânica e amigável, definida no arquivo [globals.css](file:///c:/Users/x990351/Documents/DoeJA/app/globals.css).
 
-#### Como aplicar os temas no código:
-No arquivo [globals.css](file:///c:/Documentos/DoeJA/app/globals.css), mapeamos variáveis de cores do tema para classes do Tailwind.
-*   **Sempre use variáveis de cores no CSS ou classes do Tailwind mapeadas:**
-    *   `bg-bg-color` (Cor de fundo principal)
-    *   `text-text-primary` (Cor de texto padrão)
-    *   `bg-accent-color` (Cor de botões de destaque e destaques visuais)
-    *   `border-project-style` (Borda dinâmica: invisível no Orgânico, preta de 3px no Retro)
-    *   `radius-project-btn` (Arredondamento: redondo no Orgânico, quadrado no Retro)
-
-*   *Exemplo prático de botão com tema dinâmico:*
-    ```tsx
-    <button className="bg-accent-color text-text-white border-project-style radius-project-btn px-6 py-2">
-      Botão Dinâmico
-    </button>
-    ```
-
-#### O Hook `useTheme`
-Para criar elementos que precisam saber qual tema está ativo ou que precisam alternar o tema, utilize o hook [useTheme.ts](file:///c:/Documentos/DoeJA/hooks/useTheme.ts):
-```tsx
-import { useTheme } from "@/hooks/useTheme";
-
-const { theme, toggleTheme } = useTheme();
-// 'theme' será "theme-organic" ou "theme-retro"
-```
+*   Sempre utilize as variáveis e classes utilitárias de espaçamento e cores do nosso design system (como `bg-background`, `text-on-surface`, `px-margin-desktop`, `gap-md`).
+*   Consulte mais detalhes didáticos sobre como estilizar e trabalhar com o CSS em nosso [Guia de Diretrizes de Desenvolvimento](file:///c:/Users/x990351/Documents/DoeJA/docs/DEVELOPER_GUIDELINES.md).
 
 ### D. Concatenação Segura de Classes com `cn`
 Quando você precisar aplicar classes CSS de forma condicional, ou aceitar estilos adicionais via props no seu componente, use a função utilitária `cn` localizada em `lib/utils/cn.ts`. Ela une o `clsx` com o `tailwind-merge` para evitar que classes Tailwind conflitantes se quebrem mutuamente.
@@ -211,22 +187,14 @@ Este comando executará todas as suites de testes do projeto e mostrará o relat
 
 ### Onde e como criar novos testes:
 Crie os arquivos de teste na mesma pasta onde está a lógica ou componente, utilizando a extensão `.test.ts` (ou `.test.tsx`).
-*   *Exemplo de teste unitário (`hooks/useTheme.test.ts`)*:
+*   *Exemplo de teste unitário (`lib/utils/cn.test.ts`)*:
     ```typescript
-    import { renderHook, act } from "@testing-library/react";
     import { describe, it, expect } from "vitest";
-    import { useTheme } from "./useTheme";
+    import { cn } from "./cn";
 
-    describe("useTheme", () => {
-      it("deve alternar o tema corretamente", () => {
-        const { result } = renderHook(() => useTheme());
-        expect(result.current.theme).toBe("theme-organic"); // Inicia Orgânico
-        
-        act(() => {
-          result.current.toggleTheme();
-        });
-        
-        expect(result.current.theme).toBe("theme-retro"); // Muda para Retro
+    describe("cn utility function", () => {
+      it("deve concatenar classes do Tailwind corretamente", () => {
+        expect(cn("bg-red-500", "text-white")).toBe("bg-red-500 text-white");
       });
     });
     ```

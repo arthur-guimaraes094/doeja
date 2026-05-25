@@ -38,12 +38,14 @@ export default function Home() {
       {/* Header */}
       <Header />
 
-      <main className="relative min-h-screen flex flex-col items-center pt-xl bg-background text-on-surface">
+      <main className="relative min-h-screen flex flex-col items-center pt-xl md:pt-0 bg-background text-on-surface overflow-hidden">
+        {/* Global background floating animation */}
+        <div className="absolute inset-0 -top-24 z-0 pointer-events-none opacity-85">
+          <FloatingVegetables2D />
+        </div>
+
         {/* Hero Section */}
-        <section className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center justify-center py-16 z-10">
-          <div className="absolute inset-0 -top-24 z-0 pointer-events-none opacity-85">
-            <FloatingVegetables2D />
-          </div>
+        <section className="relative w-full min-h-[500px] md:min-h-0 md:h-[calc(100vh-72px)] flex items-center justify-center py-16 md:py-8 z-10">
 
           <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-lg w-full flex flex-col items-center">
             <div className="space-y-md">
@@ -55,12 +57,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative flex justify-center items-center h-[350px] md:h-[400px] w-full max-w-3xl mx-auto mt-6">
+            <div className="relative flex justify-center items-center h-[350px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-full max-w-3xl mx-auto mt-6">
               <Image
                 src="/logo.svg"
                 alt="Logo DoeJÁ"
                 fill
-                className="object-contain object-left"
+                className="object-contain object-center"
                 priority
               />
             </div>
@@ -77,61 +79,52 @@ export default function Home() {
         </section>
 
         {/* Bento Grid Section (Value Props) */}
-        <section className="w-full max-w-7xl px-margin-mobile md:px-margin-desktop py-xl mt-lg grid grid-cols-1 md:grid-cols-3 gap-md">
-          {/* Card 1 (colspan-2) */}
-          <div className="md:col-span-2 tactile-card bg-surface-container-low p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg">
+        <section className="relative z-10 w-full max-w-7xl px-margin-mobile md:px-margin-desktop py-xl mt-lg grid grid-cols-1 md:grid-cols-3 gap-md">
+          {/* Card 1 (colspan-2) - Soft Green */}
+          <div className="md:col-span-2 group tactile-card bg-[#edf2e2]/60 backdrop-blur-md border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-headline-lg text-headline-lg text-primary">Transparência Total</h3>
               <p className="font-body-lg text-body-lg text-on-surface-variant">
                 Acompanhe cada centavo da sua doação. Relatórios detalhados e fotos do impacto real nas comunidades atendidas.
               </p>
             </div>
-            <div className="w-full md:w-48 aspect-square bg-primary-container rounded-2xl flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[80px] text-on-primary-container">analytics</span>
-            </div>
+            <span className="material-symbols-outlined text-[88px] text-primary shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">analytics</span>
           </div>
 
-          {/* Card 2 */}
-          <div className="tactile-card bg-tertiary-container p-lg rounded-[32px] flex flex-col justify-between text-left">
+          {/* Card 2 - Soft Orange */}
+          <div className="group tactile-card bg-[#fff1eb]/60 backdrop-blur-md border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <span className="material-symbols-outlined text-[48px] text-on-tertiary-container">verified_user</span>
-              <h3 className="font-headline-md text-headline-md text-on-tertiary-container">ONGs Verificadas</h3>
-              <p className="font-body-md text-body-md text-on-tertiary-container/90">
+              <span className="material-symbols-outlined text-[48px] text-secondary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">verified_user</span>
+              <h3 className="font-headline-md text-headline-md text-secondary">ONGs Verificadas</h3>
+              <p className="font-body-md text-body-md text-on-surface-variant">
                 Trabalhamos apenas com instituições auditadas e com histórico comprovado de impacto social.
               </p>
             </div>
           </div>
 
-          {/* Card 3 */}
-          <div className="tactile-card bg-secondary-fixed p-lg rounded-[32px] flex flex-col justify-between text-left">
+          {/* Card 3 - Soft Green */}
+          <div className="group tactile-card bg-[#edf2e2]/60 backdrop-blur-md border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <span className="material-symbols-outlined text-[48px] text-on-secondary-fixed">diversity_3</span>
-              <h3 className="font-headline-md text-headline-md text-on-secondary-fixed">Comunidade Viva</h3>
-              <p className="font-body-md text-body-md text-on-secondary-fixed/90">
+              <span className="material-symbols-outlined text-[48px] text-primary transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">diversity_3</span>
+              <h3 className="font-headline-md text-headline-md text-primary">Comunidade Viva</h3>
+              <p className="font-body-md text-body-md text-on-surface-variant">
                 Junte-se a mais de 10.000 doadores ativos que estão transformando o Brasil diariamente.
               </p>
             </div>
           </div>
 
-          {/* Card 4 (colspan-2) */}
-          <div className="md:col-span-2 tactile-card bg-surface-container-highest p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg overflow-hidden">
+          {/* Card 4 (colspan-2) - Soft Orange */}
+          <div className="md:col-span-2 group tactile-card bg-[#fff1eb]/60 backdrop-blur-md border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-headline-lg text-headline-lg text-secondary">Seja um Parceiro</h3>
               <p className="font-body-lg text-body-lg text-on-surface-variant">
                 Sua empresa pode fazer a diferença. Conheça nossos planos corporativos de responsabilidade social.
               </p>
-              <button className="bg-secondary text-white px-md py-2 rounded-full font-label-md hover:bg-secondary/90 transition-colors cursor-pointer">
+              <button className="bg-secondary text-white px-8 py-3 rounded-full font-label-md hover:bg-secondary/90 hover:scale-105 active:scale-95 transition-all shadow-md hover:shadow-lg cursor-pointer">
                 Saber Mais
               </button>
             </div>
-            <div className="w-full md:w-64 h-48 relative shrink-0 rounded-xl overflow-hidden shadow-md">
-              <Image
-                src="/handshake.jpg"
-                alt="Parceria e Confiança"
-                fill
-                className="object-cover"
-              />
-            </div>
+            <span className="material-symbols-outlined text-[88px] text-secondary shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">handshake</span>
           </div>
         </section>
 
@@ -140,10 +133,9 @@ export default function Home() {
           <span className="material-symbols-outlined">volunteer_activism</span>
           <span className="font-label-md hidden md:block">Doar Agora</span>
         </button>
+        {/* Footer */}
+        <Footer />
       </main>
-
-      {/* Footer */}
-      <Footer />
     </>
   );
 }
