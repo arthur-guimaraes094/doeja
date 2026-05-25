@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Hero3D from "../components/Hero3D";
+import FloatingVegetables2D from "../components/FloatingVegetables2D";
 
 export default function Home() {
   // Setup client-side intersection observer for scroll reveal of Bento cards
@@ -40,33 +40,39 @@ export default function Home() {
 
       <main className="relative min-h-screen flex flex-col items-center pt-xl bg-background text-on-surface">
         {/* Hero Section */}
-        <section className="max-w-4xl px-margin-mobile text-center z-10 space-y-lg w-full">
-          <div className="space-y-md">
-            <h1 className="font-display-lg text-[40px] md:text-[48px] font-extrabold leading-tight text-on-background">
-              Seu gesto pode mudar histórias
-            </h1>
-            <p className="font-headline-md text-[20px] md:text-[24px] text-on-surface-variant">
-              <span className="text-primary font-extrabold">Doe</span><span className="text-secondary font-extrabold">JÁ</span> e leve mais do que alimento, leve <span className="text-primary font-extrabold">cuidado</span> e <span className="text-primary font-extrabold">esperança</span>.
-            </p>
+        <section className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center justify-center py-16 z-10">
+          <div className="absolute inset-0 -top-24 z-0 pointer-events-none opacity-85">
+            <FloatingVegetables2D />
           </div>
 
-          <div className="relative flex justify-center items-center h-[350px] md:h-[400px] w-full max-w-3xl mx-auto mt-6">
-            <Image
-              src="/logo.svg"
-              alt="Logo DoeJÁ"
-              fill
-              className="object-contain object-left"
-              priority
-            />
-          </div>
+          <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-lg w-full flex flex-col items-center">
+            <div className="space-y-md">
+              <h1 className="font-display-lg text-[40px] md:text-[48px] font-extrabold leading-tight text-on-background">
+                Seu gesto pode mudar histórias
+              </h1>
+              <p className="font-headline-md text-[20px] md:text-[24px] text-on-surface-variant">
+                <span className="text-primary font-extrabold">Doe</span><span className="text-secondary font-extrabold">JÁ</span> e leve mais do que alimento, leve <span className="text-primary font-extrabold">cuidado</span> e <span className="text-primary font-extrabold">esperança</span>.
+              </p>
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-md justify-center pt-md">
-            <button className="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
-              Quero Doar Agora
-            </button>
-            <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-headline-md bg-white hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
-              Ver Projetos
-            </button>
+            <div className="relative flex justify-center items-center h-[350px] md:h-[400px] w-full max-w-3xl mx-auto mt-6">
+              <Image
+                src="/logo.svg"
+                alt="Logo DoeJÁ"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-md justify-center pt-md">
+              <button className="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                Quero Doar Agora
+              </button>
+              <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-headline-md bg-white hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
+                Ver Projetos
+              </button>
+            </div>
           </div>
         </section>
 
