@@ -1,19 +1,13 @@
 import { Metadata } from "next";
-import { Fredoka, Lilita_One } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
-const fredoka = Fredoka({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-fredoka-next",
-});
-
-const lilitaOne = Lilita_One({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-lilita-next",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
+    <html lang="pt-BR" className={`${plusJakartaSans.variable} font-sans`}>
+      <head>
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      </head>
       <body>
         {children}
         <Analytics />

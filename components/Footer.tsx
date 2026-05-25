@@ -1,19 +1,41 @@
 import React from "react";
-import EggplantSvg from "./EggplantSvg";
-import TomatoSvg from "./TomatoSvg";
+import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-footer-bg border-t-project-style h-20 relative mt-auto">
-      <div className="absolute bottom-0 left-0 right-0 h-[120px] pointer-events-none">
-        <div className="decor-eggplant absolute bottom-2.5 left-[2%] md:left-[5%] pointer-events-auto transition-transform duration-300 hover:scale-110 hover:-rotate-5">
-          <EggplantSvg />
-        </div>
-        <div className="decor-tomato absolute bottom-2.5 right-[2%] md:right-[5%] pointer-events-auto transition-transform duration-300 hover:scale-110 hover:rotate-5">
-          <TomatoSvg />
+    <footer className="relative mt-xl border-t border-surface-variant bg-surface min-h-[140px] pb-10">
+      {/* Main Footer Content */}
+      <div className="relative z-10 flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop pt-lg pb-4 space-y-md md:space-y-0 max-w-7xl mx-auto">
+        
+          <div className="relative h-10 w-28 mb-1">
+            <Image 
+              src="/logo.svg" 
+              alt="Logo DoeJÁ" 
+              fill
+              className="object-contain object-center md:object-left"
+            />
+          </div>
+          <p className="font-label-md text-label-md text-on-surface-variant text-center md:text-left">
+            © 2026 DoeJÁ. Conectando generosidade a quem precisa.
+          </p>
+        
+        
+        <nav className="flex flex-wrap justify-center gap-md">
+          <a className="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacidade</a>
+          <a className="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Termos de Uso</a>
+          <a className="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Contato</a>
+          <a className="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Sobre Nós</a>
+        </nav>
+        
+        <div className="flex gap-md">
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#" aria-label="Website">
+            <span className="material-symbols-outlined">public</span>
+          </a>
+          <a className="text-on-surface-variant hover:text-primary transition-colors" href="#" aria-label="Compartilhar">
+            <span className="material-symbols-outlined">share</span>
+          </a>
         </div>
       </div>
     </footer>
   );
 }
-
