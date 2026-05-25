@@ -25,17 +25,17 @@ export default function FloatingVegetables2D() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let width = canvas.clientWidth;
-    let height = canvas.clientHeight;
-    canvas.width = width;
-    canvas.height = height;
-
     const imageUrls = [
-      { url: "/Abobora.svg", ratio: 711 / 615 },
-      { url: "/Banana.svg", ratio: 1 },
-      { url: "/Espinafre.svg", ratio: 1 },
-      { url: "/Laranja.svg", ratio: 398 / 461 },
-      { url: "/Maca.svg", ratio: 1 },
+      { url: "/Abobora.webp", ratio: 711 / 615 },
+      { url: "/Banana.webp", ratio: 1 },
+      { url: "/Espinafre.webp", ratio: 1 },
+      { url: "/Laranja.webp", ratio: 398 / 461 },
+      { url: "/Maca.webp", ratio: 1 },
+      { url: "/Morango.webp", ratio: 940 / 1230 },
+      { url: "/Melancia.webp", ratio: 1428 / 1230 },
+      { url: "/Pessego.webp", ratio: 1222 / 1230 },
+      { url: "/Beringela.webp", ratio: 744 / 1230 },
+      { url: "/Coco.webp", ratio: 1262 / 1230 },
     ];
 
     const images: HTMLImageElement[] = [];
@@ -48,10 +48,13 @@ export default function FloatingVegetables2D() {
       images.push(img);
     });
 
-    // Initialize 15 floating items
+    let width = 0;
+    let height = 0;
+
+    // Initialize 20 floating items
     const initItems = () => {
       items.length = 0;
-      const count = 15;
+      const count = 25;
       
       for (let i = 0; i < count; i++) {
         const imgIndex = i % images.length;
@@ -70,7 +73,7 @@ export default function FloatingVegetables2D() {
 
         // Random velocities
         const vx = (Math.random() - 0.5) * 0.8;
-        const baseSpeedY = -0.3 - Math.random() * 0.5; // Constant slow drift upwards
+        const baseSpeedY = 0.3 + Math.random() * 0.5; // Constant slow drift downwards
         const vy = baseSpeedY;
 
         items.push({
@@ -88,8 +91,23 @@ export default function FloatingVegetables2D() {
       }
     };
 
-    // Re-initialize items when canvas sizes are ready
-    initItems();
+    // Resize Observer to keep canvas buffer and layout sizes synchronized
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0) return;
+      const entry = entries[0];
+      const newWidth = entry.contentRect.width;
+      const newHeight = entry.contentRect.height;
+
+      if (newWidth !== width || newHeight !== height) {
+        width = newWidth;
+        height = newHeight;
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        initItems();
+      }
+    });
+
+    resizeObserver.observe(canvas);
 
     // Mouse Tracking Coordinates
     let mouseX = -9999;
@@ -119,8 +137,8 @@ export default function FloatingVegetables2D() {
 
       // Positive delta means scroll down -> push items UP (negative Y velocity in 2D canvas)
       // Clamping delta to prevent items from flying away too aggressively
-      const maxImpulse = 8;
-      const rawImpulse = delta * 0.035;
+      const maxImpulse = 3;
+      const rawImpulse = delta * 0.01;
       const impulse = Math.max(-maxImpulse, Math.min(maxImpulse, rawImpulse));
 
       items.forEach((item) => {
@@ -190,7 +208,7 @@ export default function FloatingVegetables2D() {
         // Wrap vertical bounds
         if (item.y > height + marginH) {
           item.y = -marginH;
-          item.vy = item.baseSpeedY; // Reset to slow upward speed
+          item.vy = item.baseSpeedY; // Reset to slow downward speed
         } else if (item.y < -marginH) {
           item.y = height + marginH;
           item.vy = item.baseSpeedY;
@@ -209,24 +227,13 @@ export default function FloatingVegetables2D() {
 
     updateAndDraw();
 
-    // Resize Handler
-    const handleResize = () => {
-      width = canvas.clientWidth;
-      height = canvas.clientHeight;
-      canvas.width = width;
-      canvas.height = height;
-      initItems(); // Recalculate dimensions for responsive sizes
-    };
-
-    window.addEventListener("resize", handleResize);
-
     // Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 
