@@ -1,75 +1,78 @@
 @import "tailwindcss";
+
 @source "../components";
 @source ".";
 
 @theme {
-  --color-bg-color: var(--bg-color);
-  --color-header-bg: var(--header-bg);
-  --color-footer-bg: var(--footer-bg);
-  --color-accent-color: var(--accent-color);
-  --color-accent-hover: var(--accent-hover);
-  --color-text-primary: var(--text-primary);
-  --color-text-white: var(--text-white);
-  --color-nav-link-color: var(--nav-link-color);
-  --color-nav-link-hover: var(--nav-link-hover);
-  
-  --font-fredoka: var(--font-fredoka-next), sans-serif;
-  --font-lilita: var(--font-lilita-next), sans-serif;
+  --color-primary: #4d6617;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #a8c66c;
+  --color-on-primary-container: #3b5201;
+  --color-secondary: #8c4f00;
+  --color-secondary-container: #fd9923;
+  --color-on-secondary-container: #663800;
+  --color-tertiary: #2c6a4a;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #8ac9a3;
+  --color-on-tertiary-container: #155538;
+  --color-background: #fff8f6;
+  --color-on-background: #211a17;
+  --color-surface: #fff8f6;
+  --color-on-surface: #211a17;
+  --color-surface-variant: #ede0da;
+  --color-on-surface-variant: #45483b;
+  --color-outline: #757969;
+  --color-outline-variant: #c5c8b6;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff1eb;
+  --color-surface-container: #f9ebe5;
+  --color-surface-container-high: #f3e5e0;
+  --color-surface-container-highest: #ede0da;
+  --color-surface-dim: #e5d7d2;
+  --color-surface-bright: #fff8f6;
+  --color-surface-tint: #4d6617;
+  --color-secondary-fixed: #ffdcbf;
+  --color-secondary-fixed-dim: #ffb874;
+  --color-on-secondary-fixed: #2d1600;
+  --color-on-secondary-fixed-variant: #6b3b00;
+  --color-primary-fixed: #ceee8f;
+  --color-primary-fixed-dim: #b3d176;
+  --color-on-primary-fixed: #141f00;
+  --color-on-primary-fixed-variant: #374e00;
+  --color-tertiary-fixed: #b0f1c9;
+  --color-tertiary-fixed-dim: #95d4ae;
+  --color-on-tertiary-fixed: #002112;
+  --color-on-tertiary-fixed-variant: #0e5134;
+  --color-inverse-surface: #362f2b;
+  --color-inverse-on-surface: #fceee8;
+  --color-inverse-primary: #b3d176;
 
-  --animate-sway: sway 5s ease-in-out infinite alternate;
-  --animate-float-woman: float-woman 6s ease-in-out infinite;
-  --animate-wave-arm: wave-arm 3s ease-in-out infinite alternate;
-  --animate-bounce-veggie: bounce-veggie 4s ease-in-out infinite;
-  --animate-bounce-veggie-alt: bounce-veggie 4.5s ease-in-out infinite alternate;
+  /* Fonts */
+  --font-sans: var(--font-plus-jakarta), sans-serif;
+  --font-plus-jakarta: var(--font-plus-jakarta), sans-serif;
+
+  /* Spacing Grid (Stitch values) */
+  --spacing-margin-desktop: 64px;
+  --spacing-margin-mobile: 16px;
+  --spacing-base: 8px;
+  --spacing-xs: 4px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 48px;
+  --spacing-xl: 80px;
+  --spacing-gutter: 24px;
 }
 
-/* Theme A: Organic & Warm variables */
-.theme-organic {
-  --bg-color: #FDEDE4;
-  --header-bg: #A3C767;
-  --footer-bg: #A3C767;
-  --accent-color: #F2911B;
-  --accent-hover: #D77A0F;
-  --text-primary: #2D3A1A;
-  --text-white: #FFFFFF;
-  --nav-link-color: #2D3A1A;
-  --nav-link-hover: #1e2911;
-  --font-family: var(--font-fredoka-next), sans-serif;
-  --border-style: none;
-  --box-shadow-hero: 0 8px 30px rgba(45, 58, 26, 0.08);
-  --box-shadow-btn: 0 4px 14px rgba(242, 145, 27, 0.4);
-  --border-radius-btn: 25px;
-  --stroke-color: transparent;
-  --stroke-width: 0px;
-}
-
-/* Theme C: Retro Poster variables */
-.theme-retro {
-  --bg-color: #FFF5D6;
-  --header-bg: #82B342;
-  --footer-bg: #82B342;
-  --accent-color: #E27D00;
-  --accent-hover: #C66800;
-  --text-primary: #000000;
-  --text-white: #FFFFFF;
-  --nav-link-color: #000000;
-  --nav-link-hover: #000000;
-  --font-family: var(--font-lilita-next), var(--font-fredoka-next), sans-serif;
-  --border-style: 3px solid #000000;
-  --box-shadow-hero: 6px 6px 0px #000000;
-  --box-shadow-btn: 4px 4px 0px #000000;
-  --border-radius-btn: 0px;
-  --stroke-color: #000000;
-  --stroke-width: 3px;
-}
-
-/* Resets and Base CSS */
 @layer base {
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   }
 
   body {
@@ -77,102 +80,65 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-    background-color: var(--bg-color);
-    font-family: var(--font-family);
-    color: var(--text-primary);
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
   }
 
-  button, input, select, textarea {
-    font-family: inherit;
-  }
-
-  .ill-svg {
-    width: 100%;
-    height: auto;
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    line-height: 1;
   }
 }
 
-/* Custom visual attributes not easily represented as generic Tailwind v4 utility values */
-.border-project-style {
-  border: var(--border-style);
+/* Custom visual components and cards from Stitch */
+.tactile-card {
+  box-shadow: 0 4px 6px -1px rgba(77, 102, 23, 0.04), 0 2px 4px -1px rgba(77, 102, 23, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.border-t-project-style {
-  border-top: var(--border-style);
+.tactile-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(77, 102, 23, 0.1), 0 4px 6px -2px rgba(77, 102, 23, 0.1);
+  transform: translateY(-4px);
 }
 
-.border-b-project-style {
-  border-bottom: var(--border-style);
+.floating-element {
+  animation: float 6s ease-in-out infinite;
 }
 
-.shadow-project-hero {
-  box-shadow: var(--box-shadow-hero);
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
-.shadow-project-btn {
-  box-shadow: var(--box-shadow-btn);
-}
-
-.radius-project-btn {
-  border-radius: var(--border-radius-btn);
-}
-
-/* default highlights & illustration shadows */
-.highlight-doe {
-  color: #1a6b32; /* Organic green */
-}
-.highlight-ja {
-  color: var(--accent-color);
-}
-
-.illustration-wrapper {
-  filter: drop-shadow(0px 8px 16px rgba(45, 58, 26, 0.05));
-}
-.theme-retro .illustration-wrapper {
-  filter: none;
-}
-
-/* webkit text strokes for retro theme headers */
-.theme-retro .highlight-doe {
-  color: #82B342;
-  -webkit-text-stroke: 1px #000000;
-}
-.theme-retro .highlight-ja {
-  -webkit-text-stroke: 1px #000000;
-}
-
-/* Animation classes for SVG characters (Organic Mode Only) */
-.theme-organic #svg-daisy {
+/* Character animations from the SVGs */
+#svg-daisy {
   animation: sway 5s ease-in-out infinite alternate;
   transform-origin: bottom center;
 }
 
-.theme-organic #svg-woman {
+#svg-woman {
   animation: float-woman 6s ease-in-out infinite;
 }
 
-.theme-organic .woman-arm {
+.woman-arm {
   animation: wave-arm 3s ease-in-out infinite alternate;
   transform-origin: 130px 90px;
 }
 
-.theme-organic #svg-tomato {
+#svg-tomato {
   animation: bounce-veggie 4s ease-in-out infinite;
 }
 
-.theme-organic #svg-eggplant {
+#svg-eggplant {
   animation: bounce-veggie 4.5s ease-in-out infinite alternate;
 }
 
-/* Retro Shadow Modifications for SVGs */
-.theme-retro .decor-eggplant svg,
-.theme-retro .decor-tomato svg,
-.theme-retro #svg-daisy,
-.theme-retro #svg-woman {
-  filter: drop-shadow(4px 4px 0px #000000);
-}
-
-/* Keyframes animations */
 @keyframes sway {
   0% { transform: rotate(-5deg); }
   100% { transform: rotate(5deg); }
@@ -191,4 +157,15 @@
 @keyframes bounce-veggie {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+
+.illustration-wrapper {
+  filter: drop-shadow(0px 8px 16px rgba(77, 102, 23, 0.06));
+}
+
+.highlight-doe {
+  color: var(--color-primary);
+}
+.highlight-ja {
+  color: var(--color-secondary-container);
 }

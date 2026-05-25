@@ -1,67 +1,33 @@
 import React from "react";
+import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="bg-header-bg border-b-project-style py-[15px] relative z-10">
-      <div className="w-[90%] max-w-[1200px] mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-2.5 group cursor-pointer">
-          <svg 
-            className="transition-transform duration-300 group-hover:-rotate-10 group-hover:scale-110" 
-            width="40" 
-            height="40" 
-            viewBox="0 0 200 200"
-          >
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="85" 
-              fill="#a3c767" 
-              stroke="var(--stroke-color)" 
-              strokeWidth="var(--stroke-width)" 
+    <header className="sticky top-0 z-50 border-b border-surface-variant bg-surface">
+      <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-7xl mx-auto">
+        <div className="flex items-center cursor-pointer">
+          <div className="relative h-10 w-28">
+            <Image 
+              src="/logo.svg" 
+              alt="Logo DoeJÁ" 
+              fill
+              className="object-contain object-left"
+              priority
             />
-            <path 
-              d="M 60,110 Q 100,50 140,110" 
-              fill="none" 
-              stroke="white" 
-              strokeWidth="12" 
-              strokeLinecap="round" 
-            />
-            <circle 
-              cx="100" 
-              cy="120" 
-              r="25" 
-              fill="#f2911b" 
-              stroke="var(--stroke-color)" 
-              strokeWidth="var(--stroke-width)" 
-            />
-          </svg>
-          <span className="text-[28px] font-bold text-text-primary">DoeJÁ</span>
+          </div>
         </div>
-        <nav className="hidden md:flex gap-[30px]">
-          <a 
-            href="#" 
-            className="relative text-lg font-semibold text-nav-link-color hover:text-nav-link-hover after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-text-primary after:transition-all after:duration-300 hover:after:w-full"
-          >
-            Doações
-          </a>
-          <a 
-            href="#" 
-            className="relative text-lg font-semibold text-nav-link-color hover:text-nav-link-hover after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-text-primary after:transition-all after:duration-300 hover:after:w-full"
-          >
-            ONGs
-          </a>
-          <a 
-            href="#" 
-            className="relative text-lg font-semibold text-nav-link-color hover:text-nav-link-hover after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-text-primary after:transition-all after:duration-300 hover:after:w-full"
-          >
-            Seja um parceiro!
-          </a>
+        
+        <nav className="hidden md:flex items-center space-x-lg">
+          <a className="font-body-lg text-body-lg text-primary border-b-2 border-primary pb-1 font-bold" href="#">Doações</a>
+          <a className="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">ONGs</a>
+          <a className="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Seja um parceiro!</a>
         </nav>
-        <button className="bg-accent-color text-text-white border-project-style radius-project-btn px-6 py-2.5 text-lg font-bold cursor-pointer shadow-project-btn transition-all duration-300 hover:bg-accent-hover hover:-translate-y-0.5 active:translate-y-0">
-          Login
-        </button>
+        
+        <div className="flex items-center gap-md">
+          <button className="hidden md:block font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Conta</button>
+          <button className="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full font-headline-md text-body-md shadow-md hover:scale-95 transition-transform">Login</button>
+        </div>
       </div>
     </header>
   );
 }
-
