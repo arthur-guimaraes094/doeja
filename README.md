@@ -1,114 +1,188 @@
-# DoeJÁ - Conectando Doadores de Alimentos e ONGs
+# 🍎 DoeJÁ - Conectando Doadores de Alimentos e ONGs
 
-O **DoeJÁ** é um projeto de impacto social desenvolvido em **Next.js** (App Router) cujo principal objetivo é facilitar e agilizar a ponte entre doadores de alimentos e ONGs locais de assistência social.
+Bem-vindo(a) ao repositório do **DoeJÁ**! Este é um projeto de impacto social que visa combater a fome e o desperdício de alimentos. Facilitamos a conexão rápida e segura entre pessoas ou estabelecimentos com excedente de comida (doadores) e ONGs locais que realizam assistência social.
+
+Este documento foi pensado especialmente para **desenvolvedores que estão ingressando no time**. Aqui você encontrará tudo o que precisa para entender a arquitetura do projeto, configurar seu ambiente e começar a contribuir de forma confiante.
 
 ---
 
-## 🚀 Como Rodar o Projeto Localmente
+## 🚀 1. Configurando e Executando o Projeto Localmente
 
-1. **Clonar o Repositório:**
+Antes de começar, certifique-se de ter o **Node.js** instalado na sua máquina (recomendamos a versão LTS recente).
+
+### Passo a Passo:
+1. **Clonar o repositório:**
    ```bash
    git clone https://github.com/arthur-guimaraes094/doeja.git
    cd doeja
    ```
 
-2. **Mudar para a Branch de Desenvolvimento:**
+2. **Trocar para a branch de desenvolvimento:**
+   No nosso fluxo, nunca trabalhamos diretamente na branch principal (`master`). Sempre partimos da `development`:
    ```bash
    git checkout development
    ```
 
-3. **Instalar Dependências:**
+3. **Instalar as dependências:**
+   Este comando lê o arquivo `package.json` e instala todas as bibliotecas necessárias para o projeto rodar (incluindo o React, Next.js, Tailwind CSS e ferramentas de teste):
    ```bash
    npm install
    ```
 
-4. **Rodar o Servidor de Desenvolvimento:**
+4. **Executar o servidor de desenvolvimento:**
+   Inicia a aplicação em modo de desenvolvimento local com atualização em tempo real (Hot Reload):
    ```bash
    npm run dev
    ```
-   Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver a aplicação em execução.
+   Agora, abra seu navegador e acesse: [http://localhost:3000](http://localhost:3000)
 
-5. **Gerar Build de Produção (Validação):**
+5. **Testar a compilação (Build de Produção):**
+   Para verificar se o TypeScript e o Next.js estão prontos para irem ao ar sem erros de compilação:
    ```bash
    npm run build
    ```
 
 ---
 
-## 🌿 Fluxo de Trabalho do Git (Git Flow da Equipe)
+## 🌿 2. Nosso Fluxo de Trabalho do Git (Git Flow)
 
-Para garantir a organização e a qualidade do código em equipe, adotamos um fluxo bem estruturado de branches e revisões. **Arthur atua como Líder do Projeto e é o responsável final pela integridade da branch de produção.**
+Trabalhar em equipe exige organização para evitar que o código de um desenvolvedor sobrescreva o do outro. Adotamos o seguinte padrão:
 
-### 1. Nossas Branches
-*   **`master` (Produção):** Contém apenas o código estável, testado e pronto para deploy de produção. **Apenas o Líder do Projeto realiza commits diretos ou merges nesta branch.**
-*   **`development` (Integração):** Branch principal onde todo o desenvolvimento da equipe é integrado. Todas as novas features são baseadas nela.
-*   **`feature/nome-da-feature`:** Ramificações temporárias criadas por desenvolvedores para criar novas telas, componentes ou correções.
+### Nossas Branches Principais:
+*   `master` (Produção): Contém o código mais estável do projeto. **Somente o líder do projeto (Arthur) realiza o merge final nessa branch.**
+*   `development` (Integração): A branch ativa de trabalho da equipe. É daqui que você puxa atualizações e é para onde envia suas novas funcionalidades.
 
-### 2. Passo a Passo para Desenvolver uma Feature
-
-1. **Atualize sua branch local `development`:**
+### Criando uma Feature (Passo a Passo):
+1. **Garanta que sua branch de desenvolvimento local está atualizada:**
    ```bash
    git checkout development
-   ```
-   ```bash
    git pull origin development
    ```
-
-2. **Crie a sua branch de feature (com nome descritivo):**
+2. **Crie uma branch específica para a sua tarefa:**
+   Use nomes claros e descritivos separados por hífens.
+   *   *Exemplo:* `feature/tela-doacoes` ou `feature/fix-header`
    ```bash
-   git checkout -b feature/minha-nova-tela
+   git checkout -b feature/nome-da-sua-tarefa
    ```
-
-3. **Desenvolva e valide localmente:**
-   - Garanta que a aplicação compila sem erros executando `npm run build`.
-
-4. **Envie a branch para o GitHub:**
+3. **Desenvolva e faça Commits frequentes:**
+   Tente fazer commits pequenos e com mensagens claras explicando o que foi feito (ex: `git commit -m "feat: adiciona componente de card de ong"`).
+4. **Envie sua branch para o repositório remoto (GitHub):**
    ```bash
-   git push -u origin feature/minha-nova-tela
+   git push -u origin feature/nome-da-sua-tarefa
    ```
-
 5. **Abra um Pull Request (PR):**
-   - Crie o PR no GitHub escolhendo como destino (**base**) a branch `development`.
-   - Adicione descrição clara das modificações e capturas de tela, caso haja alterações visuais.
-
-6. **Revisão e Merge para `development`:**
-   - Outro membro da equipe revisa o código. Uma vez aprovado, a feature é mesclada em `development`.
-
-7. **Merge de `development` para `master` (Produção):**
-   - Quando as funcionalidades em `development` estiverem validadas e prontas para release, o líder Arthur abrirá e aprovará o Pull Request de `development` para `master`.
+   No GitHub, abra um PR solicitando a mesclagem da sua branch `feature/*` para a branch `development`. Descreva o que você implementou, adicione prints de tela se alterou a parte visual e peça a revisão de um colega.
 
 ---
 
-## 🎨 Padrões de Código e Guia de Desenvolvimento
+## 📂 3. Entendendo a Estrutura de Pastas
 
-### 1. Criando Novas Telas (Rotas)
-Utilizamos o **App Router** do Next.js. Para criar uma nova rota, crie uma pasta dentro de `app/` e nela adicione um arquivo `page.js`.
-*   *Exemplo:* Para a rota `/doacoes`, crie a pasta `app/doacoes/` contendo o arquivo `app/doacoes/page.js`:
-    ```javascript
-    export default function DoacoesPage() {
+Aqui está um mapa resumido do projeto para você saber exatamente onde encontrar ou criar seus arquivos:
+
+```
+doeja/
+├── app/                    # Páginas, layouts e estilos globais (Next.js App Router)
+│   ├── globals.css         # Importações do Tailwind v4, customizações e variáveis de tema
+│   ├── layout.tsx          # Layout base comum a todas as páginas (Fontes e metadados SEO)
+│   └── page.tsx            # A página inicial (Landing Page principal do projeto)
+├── components/             # Componentes visuais reutilizáveis (Header, Footer, SVGs)
+│   ├── DaisySvg.tsx        # Animação SVG inline da Margarida
+│   ├── Header.tsx          # Menu de navegação superior
+│   └── ...                 # Outros elementos visuais isolados
+├── hooks/                  # Hooks customizados (lógicas separadas da interface)
+│   └── useTheme.ts         # Controla e persiste a mudança de tema (Orgânico / Retro)
+├── lib/                    # Códigos utilitários globais
+│   └── utils/
+│       └── cn.ts           # Função auxiliar para mesclar classes de estilo
+├── docs/                   # Documentações de design e especificações
+├── tsconfig.json           # Configurações do TypeScript (Strict Mode habilitado!)
+├── vitest.config.ts        # Configurações de execução de testes com Vitest
+└── package.json            # Scripts de execução e dependências instaladas
+```
+
+---
+
+## 🎨 4. Guia Prático de Desenvolvimento e Boas Práticas
+
+### A. Criando Novas Telas (Rotas no Next.js)
+No App Router do Next.js, as rotas são definidas pela estrutura de pastas dentro de `app/`. Cada pasta representa uma URL e o arquivo de visualização deve obrigatoriamente se chamar `page.tsx`.
+*   *Exemplo:* Se você quiser criar a rota `/ongs`, crie a pasta `app/ongs/` e dentro dela crie o arquivo `page.tsx`:
+    ```tsx
+    import React from "react";
+
+    export default function OngsPage() {
       return (
-        <main>
-          <h1>Lista de Doações</h1>
+        <main className="p-8">
+          <h1 className="text-2xl font-bold">Nossas ONGs Parceiras</h1>
+          <p>Lista de instituições atendidas pelo DoeJÁ.</p>
         </main>
       );
     }
     ```
 
-### 2. Criando Componentes Reutilizáveis
-Componentes de interface compartilhados (botões, cards, SVGs) devem ficar no diretório `components/`.
-*   Sempre use componentes funcionais do React.
-*   Importe caminhos absolutos utilizando `@/components/...` (definido no `jsconfig.json`).
+### B. Criando Componentes de Interface
+Qualquer elemento que puder ser reutilizado em mais de uma página (ex: Botões customizados, Cards, Inputs com estilo próprio) deve ser criado dentro de `components/` com a extensão `.tsx`.
+*   **Atenção ao importar**: Você pode usar o alias `@/components` ou importar de forma relativa `../components/MeuComponente`.
+*   Dê preferência a nomes de componentes em `PascalCase` (ex: `Header.tsx`, `HandsSvg.tsx`).
 
-### 3. Estilização e Temas (Nativo CSS)
-**Não utilizamos Tailwind CSS.** O projeto é estilizado usando CSS puro estruturado em variáveis globais no arquivo `app/globals.css`.
-*   **Variáveis de Tema:** O DoeJÁ possui dois temas: **Orgânico** e **Retro Pôster**. As variáveis de cores e fontes são declaradas no `globals.css` sob as classes `body.theme-organic` e `body.theme-retro`.
-*   Sempre utilize as variáveis CSS (`var(--bg-color)`, `var(--text-primary)`, etc.) ao invés de cores fixas. Isso garante que a troca de tema funcione instantaneamente quando o usuário clicar no botão de alterar tema.
+### C. Estilização: Tailwind CSS v4 e Temas Dinâmicos
+Nós usamos **Tailwind CSS v4** para construir e estilizar a interface. Adicionalmente, o DoeJÁ possui dois temas visuais completos:
+1.  **Orgânico (`theme-organic`)**: Cores quentes, bordas arredondadas e ilustrações sem borda preta.
+2.  **Retro Pôster (`theme-retro`)**: Cores contrastantes estilo jornal impresso, bordas pretas grossas e elementos quadrados.
 
-### 4. Animações e SVGs Dinâmicos
-Ilustrações fofas (Margarida, Tomate, Berinjela) são desenhadas em formato **SVG inline** e transformadas em componentes React.
-*   Para criar interações (como piscar os olhos), utilize o hook `useState` e um `useEffect` para rodar animações baseadas no tempo de forma assíncrona.
-*   *Exemplo de piscar de olhos no SVG:*
-    ```jsx
+#### Como aplicar os temas no código:
+No arquivo [globals.css](file:///c:/Documentos/DoeJA/app/globals.css), mapeamos variáveis de cores do tema para classes do Tailwind.
+*   **Sempre use variáveis de cores no CSS ou classes do Tailwind mapeadas:**
+    *   `bg-bg-color` (Cor de fundo principal)
+    *   `text-text-primary` (Cor de texto padrão)
+    *   `bg-accent-color` (Cor de botões de destaque e destaques visuais)
+    *   `border-project-style` (Borda dinâmica: invisível no Orgânico, preta de 3px no Retro)
+    *   `radius-project-btn` (Arredondamento: redondo no Orgânico, quadrado no Retro)
+
+*   *Exemplo prático de botão com tema dinâmico:*
+    ```tsx
+    <button className="bg-accent-color text-text-white border-project-style radius-project-btn px-6 py-2">
+      Botão Dinâmico
+    </button>
+    ```
+
+#### O Hook `useTheme`
+Para criar elementos que precisam saber qual tema está ativo ou que precisam alternar o tema, utilize o hook [useTheme.ts](file:///c:/Documentos/DoeJA/hooks/useTheme.ts):
+```tsx
+import { useTheme } from "@/hooks/useTheme";
+
+const { theme, toggleTheme } = useTheme();
+// 'theme' será "theme-organic" ou "theme-retro"
+```
+
+### D. Concatenação Segura de Classes com `cn`
+Quando você precisar aplicar classes CSS de forma condicional, ou aceitar estilos adicionais via props no seu componente, use a função utilitária `cn` localizada em `lib/utils/cn.ts`. Ela une o `clsx` com o `tailwind-merge` para evitar que classes Tailwind conflitantes se quebrem mutuamente.
+*   *Exemplo:*
+    ```tsx
+    import { cn } from "@/lib/utils/cn";
+
+    interface Props {
+      isDanger?: boolean;
+      className?: string;
+    }
+
+    export function Alert({ isDanger, className }: Props) {
+      return (
+        <div className={cn(
+          "p-4 rounded-md bg-green-200 text-green-800", // Estilos padrão
+          isDanger && "bg-red-200 text-red-800",       // Condicional
+          className                                    // Sobrescrever styles de fora
+        )}>
+          Alerta de Mensagem
+        </div>
+      );
+    }
+    ```
+
+### E. SVGs Dinâmicos e Animações
+Nossas ilustrações estão em arquivos `.tsx` e exportam SVGs diretos. Nós controlamos animações interativas neles através de estados do React.
+*   *Exemplo de animação (como piscar olhos de personagens)*:
+    ```tsx
     const [isBlinking, setIsBlinking] = useState(false);
     useEffect(() => {
       const interval = setInterval(() => {
@@ -117,32 +191,66 @@ Ilustrações fofas (Margarida, Tomate, Berinjela) são desenhadas em formato **
       }, 3000 + Math.random() * 4000);
       return () => clearInterval(interval);
     }, []);
-    // No JSX do SVG:
-    <ellipse cx="50" cy="50" rx="4" ry={isBlinking ? "0.5" : "4"} />
+
+    // No JSX do SVG, usamos 'isBlinking' para achatar a altura (ry) dos olhos:
+    <ellipse cx="50" cy="50" rx="4" ry={isBlinking ? 0.5 : 4} />
     ```
 
 ---
 
-## 📂 Estrutura de Pastas do Projeto
+## 🧪 5. Escrevendo e Executando Testes (Vitest)
 
+Testes automatizados evitam que modificações quebrem lógicas que já estavam funcionando no passado. Nós usamos o **Vitest** + **React Testing Library** para testes unitários.
+
+### Como rodar os testes:
+No seu terminal, execute:
+```bash
+npm run test
 ```
-doeja/
-├── .next/                  # Cache de build do Next.js
-├── app/                    # Rotas, layouts e estilos globais do Next.js
-│   ├── globals.css         # Variáveis e animações CSS principais
-│   ├── layout.js           # Layout raiz com fontes e metadados SEO
-│   └── page.js             # Tela inicial (Landing Page)
-├── components/             # Componentes React (Header, Footer, SVGs)
-│   ├── DaisySvg.jsx
-│   ├── EggplantSvg.jsx
-│   ├── Footer.jsx
-│   ├── HandsSvg.jsx
-│   ├── Header.jsx
-│   ├── TomatoSvg.jsx
-│   └── WomanSvg.jsx
-├── docs/                   # Documentação do design e planejamento
-├── vanilla-backup/         # Backup da versão HTML/CSS/JS estática original
-├── jsconfig.json           # Configuração de mapeamento de caminhos (@/*)
-├── package.json            # Dependências e scripts do projeto
-└── README.md               # Este arquivo de documentação
-```
+Este comando executará todas as suites de testes do projeto e mostrará o relatório final diretamente no terminal.
+
+### Onde e como criar novos testes:
+Crie os arquivos de teste na mesma pasta onde está a lógica ou componente, utilizando a extensão `.test.ts` (ou `.test.tsx`).
+*   *Exemplo de teste unitário (`hooks/useTheme.test.ts`)*:
+    ```typescript
+    import { renderHook, act } from "@testing-library/react";
+    import { describe, it, expect } from "vitest";
+    import { useTheme } from "./useTheme";
+
+    describe("useTheme", () => {
+      it("deve alternar o tema corretamente", () => {
+        const { result } = renderHook(() => useTheme());
+        expect(result.current.theme).toBe("theme-organic"); // Inicia Orgânico
+        
+        act(() => {
+          result.current.toggleTheme();
+        });
+        
+        expect(result.current.theme).toBe("theme-retro"); // Muda para Retro
+      });
+    });
+    ```
+
+---
+
+## 🚨 6. Checklist de Pré-Commit (Não Esqueça!)
+
+Antes de subir seu código (dar o `git push`) e abrir um Pull Request, execute localmente a validação de qualidade completa:
+
+1.  **Verifique a Formatação e Regras de Estilo:**
+    ```bash
+    npm run lint
+    ```
+    *(Garante que não existem importações não utilizadas, entidades HTML soltas ou sintaxes erradas)*
+2.  **Execute os Testes Unitários:**
+    ```bash
+    npm run test
+    ```
+    *(Garante que nenhuma funcionalidade existente foi danificada pelo seu código)*
+3.  **Execute o Build de Produção:**
+    ```bash
+    npm run build
+    ```
+    *(Garante que o TypeScript não possui erros de tipo implícitos ou incompatibilidades estruturais)*
+
+Seguindo este guia, você garantirá que o projeto continue limpo, rápido e seguro para todos os usuários e desenvolvedores! Se tiver dúvidas, procure o Arthur ou mande no canal de comunicação da equipe. Boa codificação! 🚀

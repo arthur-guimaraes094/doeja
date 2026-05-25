@@ -48,7 +48,7 @@ export default function Header() {
             href="#" 
             className="relative text-lg font-semibold text-nav-link-color hover:text-nav-link-hover after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-text-primary after:transition-all after:duration-300 hover:after:w-full"
           >
-            ONG's
+            ONGs
           </a>
           <a 
             href="#" 

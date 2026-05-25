@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { Fredoka, Lilita_One } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -15,12 +16,16 @@ const lilitaOne = Lilita_One({
   variable: "--font-lilita-next",
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "DoeJÁ - Conectando doadores de alimentos a ONGs",
   description: "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-BR" className={`${fredoka.variable} ${lilitaOne.variable} theme-organic`}>
       <body>

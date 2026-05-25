@@ -1,40 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import DaisySvg from "../components/DaisySvg";
 import WomanSvg from "../components/WomanSvg";
 import HandsSvg from "../components/HandsSvg";
+import { useTheme } from "../hooks/useTheme";
 
 export default function Home() {
-  const [theme, setTheme] = useState("theme-organic");
-
-  // Load theme from localStorage on client-side mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("doeja-theme") || "theme-organic";
-    const handle = requestAnimationFrame(() => {
-      setTheme(savedTheme);
-    });
-    return () => cancelAnimationFrame(handle);
-  }, []);
-
-  // Update html class and localStorage whenever theme changes
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "theme-organic") {
-      root.classList.add("theme-organic");
-      root.classList.remove("theme-retro");
-    } else {
-      root.classList.add("theme-retro");
-      root.classList.remove("theme-organic");
-    }
-    localStorage.setItem("doeja-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "theme-organic" ? "theme-retro" : "theme-organic"));
-  };
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
