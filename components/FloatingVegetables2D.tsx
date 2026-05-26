@@ -51,10 +51,10 @@ export default function FloatingVegetables2D() {
     let width = 0;
     let height = 0;
 
-    // Initialize 20 floating items
+    // Initialize floating items (fewer on mobile for performance)
     const initItems = () => {
       items.length = 0;
-      const count = 25;
+      const count = width < 768 ? 15 : 25;
       
       for (let i = 0; i < count; i++) {
         const imgIndex = i % images.length;
@@ -100,14 +100,15 @@ export default function FloatingVegetables2D() {
       const newHeight = entry.contentRect.height;
 
       if (newWidth !== width || newHeight !== height) {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const isMobile = newWidth < 768;
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
         width = newWidth;
         height = newHeight;
         canvas.width = newWidth * dpr;
         canvas.height = newHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
+        ctx.imageSmoothingQuality = isMobile ? "medium" : "high";
         initItems();
       }
     });
