@@ -92,6 +92,7 @@ export default function FloatingVegetables2D() {
     };
 
     // Resize Observer to keep canvas buffer and layout sizes synchronized
+    // Scale buffer by devicePixelRatio for sharp rendering on Retina/HiDPI screens
     const resizeObserver = new ResizeObserver((entries) => {
       if (!entries || entries.length === 0) return;
       const entry = entries[0];
@@ -99,10 +100,14 @@ export default function FloatingVegetables2D() {
       const newHeight = entry.contentRect.height;
 
       if (newWidth !== width || newHeight !== height) {
+        const dpr = window.devicePixelRatio || 1;
         width = newWidth;
         height = newHeight;
-        canvas.width = newWidth;
-        canvas.height = newHeight;
+        canvas.width = newWidth * dpr;
+        canvas.height = newHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
         initItems();
       }
     });
