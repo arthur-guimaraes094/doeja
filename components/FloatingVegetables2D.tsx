@@ -100,7 +100,7 @@ export default function FloatingVegetables2D() {
       const newHeight = entry.contentRect.height;
 
       if (newWidth !== width || newHeight !== height) {
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
         width = newWidth;
         height = newHeight;
         canvas.width = newWidth * dpr;
