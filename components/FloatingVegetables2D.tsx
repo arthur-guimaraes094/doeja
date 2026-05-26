@@ -101,7 +101,8 @@ export default function FloatingVegetables2D() {
 
       if (newWidth !== width || newHeight !== height) {
         const isMobile = newWidth < 768;
-        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+        // Limit mobile to 1.0 DPR and desktop to 1.8 DPR to improve fill-rate performance
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.8);
         width = newWidth;
         height = newHeight;
         canvas.width = newWidth * dpr;
@@ -154,7 +155,7 @@ export default function FloatingVegetables2D() {
       });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Animation Loop
     let animationFrameId: number;
@@ -164,7 +165,9 @@ export default function FloatingVegetables2D() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Inter-item collision detection and response
+      const time = Date.now() * 0.001;
+
+      // Inter-item collision detection and response (optimized distance checks)
       for (let i = 0; i < items.length; i++) {
         for (let j = i + 1; j < items.length; j++) {
           const a = items[i];
@@ -172,45 +175,50 @@ export default function FloatingVegetables2D() {
 
           const dx = b.x - a.x;
           const dy = b.y - a.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
           const radiusA = Math.max(a.width, a.height) * 0.4;
           const radiusB = Math.max(b.width, b.height) * 0.4;
           const minDist = radiusA + radiusB;
+          const minDistSq = minDist * minDist;
 
-          if (dist < minDist && dist > 0.1) {
-            // Normalized collision axis
-            const nx = dx / dist;
-            const ny = dy / dist;
+          // Check squared distance first to avoid Math.sqrt unless colliding
+          if (distSq < minDistSq) {
+            const dist = Math.sqrt(distSq);
+            if (dist > 0.1) {
+              // Normalized collision axis
+              const nx = dx / dist;
+              const ny = dy / dist;
 
-            // Overlap amount → proportional push strength
-            const overlap = minDist - dist;
-            const pushForce = overlap * 0.15;
+              // Overlap amount → proportional push strength
+              const overlap = minDist - dist;
+              const pushForce = overlap * 0.15;
 
-            // Push both items apart equally
-            a.vx -= nx * pushForce;
-            a.vy -= ny * pushForce;
-            b.vx += nx * pushForce;
-            b.vy += ny * pushForce;
+              // Push both items apart equally
+              a.vx -= nx * pushForce;
+              a.vy -= ny * pushForce;
+              b.vx += nx * pushForce;
+              b.vy += ny * pushForce;
 
-            // Separate positions to prevent sticking
-            const separation = overlap * 0.5;
-            a.x -= nx * separation;
-            a.y -= ny * separation;
-            b.x += nx * separation;
-            b.y += ny * separation;
+              // Separate positions to prevent sticking
+              const separation = overlap * 0.5;
+              a.x -= nx * separation;
+              a.y -= ny * separation;
+              b.x += nx * separation;
+              b.y += ny * separation;
 
-            // Add a little spin on contact
-            a.vrot += (Math.random() - 0.5) * 0.02;
-            b.vrot += (Math.random() - 0.5) * 0.02;
+              // Add a little spin on contact
+              a.vrot += (Math.random() - 0.5) * 0.02;
+              b.vrot += (Math.random() - 0.5) * 0.02;
+            }
           }
         }
       }
 
       items.forEach((item) => {
-        // Continuous slow wind force drift
-        item.vx += Math.sin(Date.now() * 0.001 + item.x) * 0.005;
-        item.vy += Math.cos(Date.now() * 0.001 + item.y) * 0.005;
+        // Continuous slow wind force drift (reusing pre-calculated time)
+        item.vx += Math.sin(time + item.x) * 0.005;
+        item.vy += Math.cos(time + item.y) * 0.005;
 
         // Apply physical equations
         item.x += item.vx;
@@ -228,19 +236,24 @@ export default function FloatingVegetables2D() {
         // Contact-only mouse repulsion
         const dx = item.x - mouseX;
         const dy = item.y - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distSq = dx * dx + dy * dy;
         
         // Exact contact boundary threshold (half of maximum dimension)
         const radius = Math.max(item.width, item.height) * 0.55;
+        const radiusSq = radius * radius;
 
-        if (distance < radius && distance > 0.1) {
-          // High intensity direct contact repulsion
-          const pushForce = ((radius - distance) / radius) * 2.8;
-          item.vx += (dx / distance) * pushForce;
-          item.vy += (dy / distance) * pushForce;
-          
-          // Spin element fast on contact
-          item.vrot += (Math.random() - 0.5) * 0.06;
+        // Check squared distance for mouse repulsion too
+        if (distSq < radiusSq) {
+          const distance = Math.sqrt(distSq);
+          if (distance > 0.1) {
+            // High intensity direct contact repulsion
+            const pushForce = ((radius - distance) / radius) * 2.8;
+            item.vx += (dx / distance) * pushForce;
+            item.vy += (dy / distance) * pushForce;
+            
+            // Spin element fast on contact
+            item.vrot += (Math.random() - 0.5) * 0.06;
+          }
         }
 
         // Screen boundary wraps
