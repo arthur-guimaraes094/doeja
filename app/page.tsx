@@ -45,7 +45,7 @@ export default function Home() {
         </div>
 
         {/* Hero Section */}
-        <section className="relative w-full min-h-0 h-[calc(100dvh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">
+        <section className="relative w-full min-h-0 h-[calc(100svh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">
 
           <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-sm md:space-y-lg w-full flex flex-col items-center">
             <div className="space-y-sm md:space-y-md">
