@@ -158,6 +158,49 @@ export default function FloatingVegetables2D() {
 
       ctx.clearRect(0, 0, width, height);
 
+      // Inter-item collision detection and response
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          const a = items[i];
+          const b = items[j];
+
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          const radiusA = Math.max(a.width, a.height) * 0.4;
+          const radiusB = Math.max(b.width, b.height) * 0.4;
+          const minDist = radiusA + radiusB;
+
+          if (dist < minDist && dist > 0.1) {
+            // Normalized collision axis
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            // Overlap amount → proportional push strength
+            const overlap = minDist - dist;
+            const pushForce = overlap * 0.15;
+
+            // Push both items apart equally
+            a.vx -= nx * pushForce;
+            a.vy -= ny * pushForce;
+            b.vx += nx * pushForce;
+            b.vy += ny * pushForce;
+
+            // Separate positions to prevent sticking
+            const separation = overlap * 0.5;
+            a.x -= nx * separation;
+            a.y -= ny * separation;
+            b.x += nx * separation;
+            b.y += ny * separation;
+
+            // Add a little spin on contact
+            a.vrot += (Math.random() - 0.5) * 0.02;
+            b.vrot += (Math.random() - 0.5) * 0.02;
+          }
+        }
+      }
+
       items.forEach((item) => {
         // Continuous slow wind force drift
         item.vx += Math.sin(Date.now() * 0.001 + item.x) * 0.005;
