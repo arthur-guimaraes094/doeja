@@ -38,17 +38,17 @@ export default function Home() {
       {/* Header */}
       <Header />
 
-      <main className="relative min-h-screen flex flex-col items-center pt-xl md:pt-0 bg-background text-on-surface overflow-hidden">
+      <main className="relative min-h-screen flex flex-col items-center pt-md md:pt-0 bg-background text-on-surface overflow-hidden">
         {/* Global background floating animation */}
         <div className="absolute inset-0 -top-24 z-0 pointer-events-none opacity-85">
           <FloatingVegetables2D />
         </div>
 
         {/* Hero Section */}
-        <section className="relative w-full min-h-[500px] md:min-h-0 md:h-[calc(100vh-72px)] flex items-center justify-center py-16 md:py-8 z-10">
+        <section className="relative w-full min-h-0 h-[calc(100dvh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">
 
-          <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-lg w-full flex flex-col items-center">
-            <div className="space-y-md">
+          <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-sm md:space-y-lg w-full flex flex-col items-center">
+            <div className="space-y-sm md:space-y-md">
               <h1 className="font-display-lg text-[40px] md:text-[48px] font-extrabold leading-tight text-on-background">
                 Seu gesto pode mudar histórias
               </h1>
@@ -57,7 +57,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative flex justify-center items-center h-[350px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-full max-w-3xl mx-auto mt-6">
+            <div className="relative flex justify-center items-center h-[220px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-full max-w-3xl mx-auto mt-2 md:mt-6">
               <Image
                 src="/logo.svg"
                 alt="Logo DoeJÁ"
@@ -67,7 +67,7 @@ export default function Home() {
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-md justify-center pt-md">
+            <div className="flex flex-col sm:flex-row gap-sm md:gap-md justify-center pt-xs md:pt-md">
               <button className="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
                 Quero Doar Agora
               </button>
