@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { GlobeIcon, ShareIcon } from "./Icons";
 
 export default function Footer() {
   return (
@@ -29,10 +30,10 @@ export default function Footer() {
         
         <div className="flex gap-md">
           <a className="text-on-surface-variant hover:text-primary transition-colors" href="#" aria-label="Website">
-            <span className="material-symbols-outlined">public</span>
+            <GlobeIcon size={24} aria-hidden="true" />
           </a>
           <a className="text-on-surface-variant hover:text-primary transition-colors" href="#" aria-label="Compartilhar">
-            <span className="material-symbols-outlined">share</span>
+            <ShareIcon size={24} aria-hidden="true" />
           </a>
         </div>
       </div>

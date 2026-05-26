@@ -71,9 +71,9 @@ export default function FloatingVegetables2D() {
         const x = Math.random() * width;
         const y = Math.random() * height;
 
-        // Random velocities
-        const vx = (Math.random() - 0.5) * 0.8;
-        const baseSpeedY = 0.3 + Math.random() * 0.5; // Constant slow drift downwards
+        // Initial velocity - purely vertical falling (with initial vx = 0)
+        const baseSpeedY = 0.4 + Math.random() * 0.6; // Slightly faster for visible motion
+        const vx = 0;
         const vy = baseSpeedY;
 
         items.push({
@@ -159,79 +159,38 @@ export default function FloatingVegetables2D() {
 
     // Animation Loop
     let animationFrameId: number;
+    let lastTime = performance.now();
 
     const updateAndDraw = () => {
       animationFrameId = requestAnimationFrame(updateAndDraw);
 
       ctx.clearRect(0, 0, width, height);
 
-      const time = Date.now() * 0.001;
+      const nowTime = performance.now();
+      // Calculate delta time relative to 60fps (16.67ms per frame)
+      const dt = Math.min((nowTime - lastTime) / 16.67, 4.0); // Cap dt to prevent massive jumps during tab suspension
+      lastTime = nowTime;
 
-      // Inter-item collision detection and response (optimized distance checks)
-      for (let i = 0; i < items.length; i++) {
-        for (let j = i + 1; j < items.length; j++) {
-          const a = items[i];
-          const b = items[j];
-
-          const dx = b.x - a.x;
-          const dy = b.y - a.y;
-          const distSq = dx * dx + dy * dy;
-
-          const radiusA = Math.max(a.width, a.height) * 0.4;
-          const radiusB = Math.max(b.width, b.height) * 0.4;
-          const minDist = radiusA + radiusB;
-          const minDistSq = minDist * minDist;
-
-          // Check squared distance first to avoid Math.sqrt unless colliding
-          if (distSq < minDistSq) {
-            const dist = Math.sqrt(distSq);
-            if (dist > 0.1) {
-              // Normalized collision axis
-              const nx = dx / dist;
-              const ny = dy / dist;
-
-              // Overlap amount → proportional push strength
-              const overlap = minDist - dist;
-              const pushForce = overlap * 0.15;
-
-              // Push both items apart equally
-              a.vx -= nx * pushForce;
-              a.vy -= ny * pushForce;
-              b.vx += nx * pushForce;
-              b.vy += ny * pushForce;
-
-              // Separate positions to prevent sticking
-              const separation = overlap * 0.5;
-              a.x -= nx * separation;
-              a.y -= ny * separation;
-              b.x += nx * separation;
-              b.y += ny * separation;
-
-              // Add a little spin on contact
-              a.vrot += (Math.random() - 0.5) * 0.02;
-              b.vrot += (Math.random() - 0.5) * 0.02;
-            }
-          }
-        }
-      }
+      const time = nowTime * 0.001;
 
       items.forEach((item) => {
-        // Continuous slow wind force drift (reusing pre-calculated time)
-        item.vx += Math.sin(time + item.x) * 0.005;
-        item.vy += Math.cos(time + item.y) * 0.005;
+        // Continuous slow wind force drift (reusing pre-calculated time and scaled by dt)
+        item.vx += Math.sin(time + item.x) * 0.005 * dt;
+        item.vy += Math.cos(time + item.y) * 0.005 * dt;
 
-        // Apply physical equations
-        item.x += item.vx;
-        item.y += item.vy;
-        item.rotation += item.vrot;
+        // Apply physical equations scaled by dt
+        item.x += item.vx * dt;
+        item.y += item.vy * dt;
+        item.rotation += item.vrot * dt;
 
-        // Friction dampening
-        item.vx *= 0.985;
-        item.vy *= 0.985;
-        item.vrot *= 0.985;
+        // Friction dampening (exponential decay adjusted for dt)
+        const frictionFactor = Math.pow(0.985, dt);
+        item.vx *= frictionFactor;
+        item.vy *= frictionFactor;
+        item.vrot *= frictionFactor;
 
-        // Restore Y base upward drift speed slowly
-        item.vy += (item.baseSpeedY - item.vy) * 0.015;
+        // Restore Y base upward drift speed slowly (adjusted for dt)
+        item.vy += (item.baseSpeedY - item.vy) * 0.015 * dt;
 
         // Contact-only mouse repulsion
         const dx = item.x - mouseX;
@@ -246,13 +205,13 @@ export default function FloatingVegetables2D() {
         if (distSq < radiusSq) {
           const distance = Math.sqrt(distSq);
           if (distance > 0.1) {
-            // High intensity direct contact repulsion
-            const pushForce = ((radius - distance) / radius) * 2.8;
+            // High intensity direct contact repulsion (adjusted for dt)
+            const pushForce = ((radius - distance) / radius) * 2.8 * dt;
             item.vx += (dx / distance) * pushForce;
             item.vy += (dy / distance) * pushForce;
             
             // Spin element fast on contact
-            item.vrot += (Math.random() - 0.5) * 0.06;
+            item.vrot += (Math.random() - 0.5) * 0.06 * dt;
           }
         }
 
@@ -269,11 +228,18 @@ export default function FloatingVegetables2D() {
 
         // Wrap vertical bounds
         if (item.y > height + marginH) {
+          // When going off bottom, reset to top at a random X coordinate
           item.y = -marginH;
+          item.x = Math.random() * width;
           item.vy = item.baseSpeedY; // Reset to slow downward speed
-        } else if (item.y < -marginH) {
-          item.y = height + marginH;
+          item.vx = 0;
+          item.vrot = (Math.random() - 0.5) * 0.008;
+        } else if (item.y < -marginH - 200) {
+          // If pushed way above the top, reset it to fall from the top
+          item.y = -marginH;
+          item.x = Math.random() * width;
           item.vy = item.baseSpeedY;
+          item.vx = 0;
         }
 
         // Draw image onto 2D canvas context if fully loaded
