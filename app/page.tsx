@@ -17,9 +17,9 @@ export default function Home() {
       {/* Header */}
       <Header />
 
-      <main className="relative min-h-screen flex flex-col items-center pt-md md:pt-0 bg-background text-on-surface overflow-hidden">
+      <main className="relative min-h-screen flex flex-col items-center pt-md md:pt-0 text-on-surface overflow-hidden">
         {/* Global background floating animation */}
-        <div className="fixed inset-0 z-0 pointer-events-none opacity-85">
+        <div className="fixed inset-0 z-[-10] pointer-events-none opacity-85">
           <FloatingVegetables2D />
         </div>
 
