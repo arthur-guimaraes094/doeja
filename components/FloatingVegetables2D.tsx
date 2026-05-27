@@ -103,6 +103,10 @@ export default function FloatingVegetables2D() {
         const isMobile = newWidth < 768;
         // Limit mobile to 1.0 DPR and desktop to 1.8 DPR to improve fill-rate performance
         const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.8);
+        
+        const isFirstInit = width === 0 && height === 0;
+        const widthChanged = newWidth !== width;
+
         width = newWidth;
         height = newHeight;
         canvas.width = newWidth * dpr;
@@ -110,7 +114,12 @@ export default function FloatingVegetables2D() {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = isMobile ? "medium" : "high";
-        initItems();
+        
+        // Only re-initialize items if it is the first load or if the width changed (e.g. orientation changes).
+        // This prevents items from flashing/resetting when the browser address bar collapses/expands on scroll.
+        if (isFirstInit || widthChanged) {
+          initItems();
+        }
       }
     });
 
