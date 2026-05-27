@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -37,15 +36,12 @@ export default function Header() {
     <header className={`sticky top-0 z-50 border-b border-surface-variant bg-[#edf2e2] transition-transform duration-300 ease-in-out ${isVisible ? "translate-y-0" : "-translate-y-full"}`}>
       <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-7xl mx-auto">
         <div className="flex items-center cursor-pointer">
-          <div className="relative h-10 w-28">
-            <Image 
-              src="/logo.svg" 
-              alt="Logo DoeJÁ" 
-              fill
-              className="object-contain object-left"
-              priority
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/logo.svg" 
+            alt="Logo DoeJÁ" 
+            className="h-10 w-auto object-contain"
+          />
         </div>
         
         <nav className="hidden md:flex items-center space-x-lg">
