@@ -55,6 +55,11 @@ O nosso fundo interativo com frutas e vegetais flutuantes ([FloatingVegetables2D
 3.  Exporte ou converta no formato **WebP** com a transparência ativada.
 4.  Salve o arquivo gerado na pasta `/public` com a extensão `.webp` (ex: `Maca.webp`).
 
+### Otimização de LCP e Logotipos SVG:
+Para imagens em formato vetorial (como o nosso `/logo.svg`) que aparecem acima da dobra (no topo do site), **não utilize o componente `<Image>` do Next.js**.
+*   **Por quê?** O Next.js não otimiza SVGs (por já serem vetoriais), e o uso do componente adiciona wrappers desnecessários e gera avisos no console relacionados a LCP (Largest Contentful Paint) e carregamento lento.
+*   **A Solução:** Use a tag HTML nativa `<img>` diretamente (ex: `<img src="/logo.svg" alt="..." className="..." />`). Isso garante carregamento instantâneo e evita overhead de JavaScript.
+
 ---
 
 ## 🚀 4. Particularidade do Next.js 16: Navegação Instantânea
@@ -100,6 +105,20 @@ Veja um exemplo didático em [cn.test.ts](file:///c:/Users/x990351/Documents/Doe
    npm run test
    ```
 
+### Testes de Performance (FPS Automatizado) 📈
+Além dos testes lógicos, garantimos que a interface rode a mais de 60 FPS estáveis usando automação de navegador com o Puppeteer.
+*   **Como executar:**
+    ```bash
+    node scripts/measure-fps.mjs
+    ```
+    Esse script inicia o servidor de desenvolvimento (caso não esteja rodando), abre um navegador em segundo plano (*headless*), simula interações de mouse e rolagem da página, e valida se o frame rate médio foi $\ge$ 60 FPS.
+
+### Monitor de Performance Visual (In-App)
+Para depurar a taxa de quadros e o tempo de renderização em tempo real na própria página:
+*   Acesse o site local com a query string `?perf=true` (ex: `http://localhost:3000/?perf=true`).
+*   Um monitor flutuante será renderizado no canto inferior esquerdo mostrando o FPS atual, o FPS mínimo registrado e um gráfico de histórico de frames.
+*   ⚠️ **Comportamento em Produção:** Por segurança e UX, **este monitor não aparece em produção por padrão** (o loop de medição fica desativado e o componente retorna `null`). Ele só ficará visível em produção se um usuário acessar a URL explicitamente com a query string `?perf=true` ou `?debug=true`, evitando assim qualquer impacto visual ou consumo de recursos para os usuários comuns.
+
 ---
 
 ## 🚨 6. Checklist antes de enviar seu código (Pull Request)
@@ -109,5 +128,6 @@ Antes de fazer o `git push` e pedir para um colega avaliar seu trabalho no GitHu
 1.  **npm.cmd run lint** (ou `npm run lint`): Checa se há importações inúteis ou erros de sintaxe.
 2.  **npm.cmd run test** (ou `npm run test`): Garante que nenhum teste quebrou.
 3.  **npm.cmd run build** (ou `npm run build`): Garante que o projeto compila sem erros para produção.
+4.  **node scripts/measure-fps.mjs**: Garante que as interações com o site não reduziram a performance do canvas abaixo da meta de 60 FPS.
 
 Seguindo esses passos simples, seu código será limpo, rápido e você se tornará um desenvolvedor excelente! Caso tenha dúvidas, estamos aqui para ajudar. Boa codificação! 🚀

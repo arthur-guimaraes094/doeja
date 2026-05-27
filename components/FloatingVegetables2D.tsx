@@ -54,7 +54,7 @@ export default function FloatingVegetables2D() {
     // Initialize floating items (fewer on mobile for performance)
     const initItems = () => {
       items.length = 0;
-      const count = width < 768 ? 15 : 25;
+      const count = width < 768 ? 6 : 12;
       
       for (let i = 0; i < count; i++) {
         const imgIndex = i % images.length;
@@ -67,12 +67,12 @@ export default function FloatingVegetables2D() {
         const w = baseWidth * ratio;
         const h = baseWidth;
 
-        // Random starting positions
+        // Distribute starting positions across the screen height for immediate visual presence on page load
         const x = Math.random() * width;
-        const y = Math.random() * height;
+        const y = -h + Math.random() * (height + h);
 
         // Initial velocity - purely vertical falling (with initial vx = 0)
-        const baseSpeedY = 0.4 + Math.random() * 0.6; // Slightly faster for visible motion
+        const baseSpeedY = 0.4 + Math.random() * 0.6;
         const vx = 0;
         const vy = baseSpeedY;
 
@@ -142,20 +142,23 @@ export default function FloatingVegetables2D() {
       const delta = currentScrollY - lastScrollY;
       lastScrollY = currentScrollY;
 
-      // Positive delta means scroll down -> push items UP (negative Y velocity in 2D canvas)
-      // Clamping delta to prevent items from flying away too aggressively
-      const maxImpulse = 3;
-      const rawImpulse = delta * 0.01;
-      const impulse = Math.max(-maxImpulse, Math.min(maxImpulse, rawImpulse));
-
       items.forEach((item) => {
-        const randomFactor = 0.8 + Math.random() * 0.6;
-        item.vy -= impulse * randomFactor; // Pushed opposite to scroll delta
-        item.vrot += (Math.random() - 0.5) * impulse * 0.02;
+        // Move item Y coordinate instantly with scroll delta for 1:1, delay-free scrolling
+        item.y -= delta;
       });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Page Visibility API to pause/resume rendering loop
+    let isTabVisible = true;
+    const handleVisibilityChange = () => {
+      isTabVisible = document.visibilityState === "visible";
+      if (isTabVisible) {
+        lastTime = performance.now(); // Reset time to avoid massive jump
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Animation Loop
     let animationFrameId: number;
@@ -164,27 +167,23 @@ export default function FloatingVegetables2D() {
     const updateAndDraw = () => {
       animationFrameId = requestAnimationFrame(updateAndDraw);
 
+      if (!isTabVisible) return;
+
       ctx.clearRect(0, 0, width, height);
 
       const nowTime = performance.now();
-      // Calculate delta time relative to 60fps (16.67ms per frame)
-      const dt = Math.min((nowTime - lastTime) / 16.67, 4.0); // Cap dt to prevent massive jumps during tab suspension
+      const dt = Math.min((nowTime - lastTime) / 16.67, 4.0);
       lastTime = nowTime;
 
-      const time = nowTime * 0.001;
-
+      // 1. Update Physics
       items.forEach((item) => {
-        // Continuous slow wind force drift (reusing pre-calculated time and scaled by dt)
-        item.vx += Math.sin(time + item.x) * 0.005 * dt;
-        item.vy += Math.cos(time + item.y) * 0.005 * dt;
-
         // Apply physical equations scaled by dt
         item.x += item.vx * dt;
         item.y += item.vy * dt;
         item.rotation += item.vrot * dt;
 
-        // Friction dampening (exponential decay adjusted for dt)
-        const frictionFactor = Math.pow(0.985, dt);
+        // Kinetic glide friction (lower friction for smoother inertia glide)
+        const frictionFactor = Math.pow(0.992, dt);
         item.vx *= frictionFactor;
         item.vy *= frictionFactor;
         item.vrot *= frictionFactor;
@@ -192,26 +191,40 @@ export default function FloatingVegetables2D() {
         // Restore Y base upward drift speed slowly (adjusted for dt)
         item.vy += (item.baseSpeedY - item.vy) * 0.015 * dt;
 
-        // Contact-only mouse repulsion
+        // Magnetic field hover repulsion (soft interaction field)
         const dx = item.x - mouseX;
         const dy = item.y - mouseY;
         const distSq = dx * dx + dy * dy;
-        
-        // Exact contact boundary threshold (half of maximum dimension)
-        const radius = Math.max(item.width, item.height) * 0.55;
-        const radiusSq = radius * radius;
+        const influenceRadius = 220; // 220px field of influence
+        const influenceRadiusSq = influenceRadius * influenceRadius;
 
-        // Check squared distance for mouse repulsion too
-        if (distSq < radiusSq) {
+        if (distSq < influenceRadiusSq) {
           const distance = Math.sqrt(distSq);
           if (distance > 0.1) {
-            // High intensity direct contact repulsion (adjusted for dt)
-            const pushForce = ((radius - distance) / radius) * 2.8 * dt;
-            item.vx += (dx / distance) * pushForce;
-            item.vy += (dy / distance) * pushForce;
-            
-            // Spin element fast on contact
-            item.vrot += (Math.random() - 0.5) * 0.06 * dt;
+            // Normalized direction vector from mouse to item
+            const dirX = dx / distance;
+            const dirY = dy / distance;
+
+            // Distance factor (1 at center, 0 at boundary, using quadratic falloff for smoothness)
+            const factor = (influenceRadius - distance) / influenceRadius;
+            const force = factor * factor; // Smooth quadratic easing
+
+            // Apply soft repulsion push force
+            const pushForce = force * 0.45 * dt;
+            item.vx += dirX * pushForce;
+            item.vy += dirY * pushForce;
+
+            // Add dynamic rotation based on mouse proximity
+            item.vrot += (Math.random() - 0.5) * force * 0.015 * dt;
+
+            // Direct contact extra kick (when mouse is very close)
+            const contactRadius = Math.max(item.width, item.height) * 0.6;
+            if (distance < contactRadius) {
+              const contactFactor = (contactRadius - distance) / contactRadius;
+              item.vx += dirX * contactFactor * 1.8 * dt;
+              item.vy += dirY * contactFactor * 1.8 * dt;
+              item.vrot += (Math.random() - 0.5) * contactFactor * 0.08 * dt;
+            }
           }
         }
 
@@ -227,23 +240,86 @@ export default function FloatingVegetables2D() {
         }
 
         // Wrap vertical bounds
-        if (item.y > height + marginH) {
-          // When going off bottom, reset to top at a random X coordinate
-          item.y = -marginH;
-          item.x = Math.random() * width;
-          item.vy = item.baseSpeedY; // Reset to slow downward speed
-          item.vx = 0;
-          item.vrot = (Math.random() - 0.5) * 0.008;
-        } else if (item.y < -marginH - 200) {
-          // If pushed way above the top, reset it to fall from the top
-          item.y = -marginH;
+        const bufferY = Math.max(height, 800);
+        if (item.y > height + bufferY + marginH) {
+          // When going too far below the viewport (e.g. by quick scroll up), wrap to top
+          item.y = -marginH - Math.random() * 100;
           item.x = Math.random() * width;
           item.vy = item.baseSpeedY;
           item.vx = 0;
+          item.vrot = (Math.random() - 0.5) * 0.008;
+        } else if (item.y < -bufferY - marginH) {
+          // When going too far above the viewport (e.g. by quick scroll down), wrap to bottom
+          item.y = height + marginH + Math.random() * 100;
+          item.x = Math.random() * width;
+          item.vy = item.baseSpeedY;
+          item.vx = 0;
+          item.vrot = (Math.random() - 0.5) * 0.008;
         }
+      });
 
-        // Draw image onto 2D canvas context if fully loaded
-        if (item.img.complete && item.img.naturalWidth !== 0) {
+      // 2. Resolve Collisions (Elastic circle-circle bounces)
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          const itemA = items[i];
+          const itemB = items[j];
+
+          const dx = itemB.x - itemA.x;
+          const dy = itemB.y - itemA.y;
+          const distSq = dx * dx + dy * dy;
+
+          const radiusA = Math.max(itemA.width, itemA.height) * 0.45;
+          const radiusB = Math.max(itemB.width, itemB.height) * 0.45;
+          const minDistance = radiusA + radiusB;
+          const minDistanceSq = minDistance * minDistance;
+
+          if (distSq < minDistanceSq) {
+            const distance = Math.sqrt(distSq);
+            if (distance > 0.1) {
+              const dirX = dx / distance;
+              const dirY = dy / distance;
+
+              // Separate items to prevent overlapping
+              const overlap = minDistance - distance;
+              itemA.x -= dirX * overlap * 0.5;
+              itemA.y -= dirY * overlap * 0.5;
+              itemB.x += dirX * overlap * 0.5;
+              itemB.y += dirY * overlap * 0.5;
+
+              // Elastic collision velocity response
+              const rvx = itemB.vx - itemA.vx;
+              const rvy = itemB.vy - itemA.vy;
+
+              // Relative velocity along normal direction
+              const velAlongNormal = rvx * dirX + rvy * dirY;
+
+              // Resolve only if items are moving towards each other
+              if (velAlongNormal < 0) {
+                const restitution = 0.5; // coefficient of bounciness
+                const impulse = -(1 + restitution) * velAlongNormal * 0.5;
+
+                itemA.vx -= dirX * impulse;
+                itemA.vy -= dirY * impulse;
+                itemB.vx += dirX * impulse;
+                itemB.vy += dirY * impulse;
+
+                // Transfer spin on bounce
+                const spinTransfer = (itemA.vrot - itemB.vrot) * 0.15;
+                itemA.vrot -= spinTransfer;
+                itemB.vrot += spinTransfer;
+                itemA.vrot += (Math.random() - 0.5) * 0.005;
+                itemB.vrot += (Math.random() - 0.5) * 0.005;
+              }
+            }
+          }
+        }
+      }
+
+      // 3. Draw Items (Visible elements only)
+      items.forEach((item) => {
+        const marginH = item.height;
+        const isVisible = item.y > -marginH && item.y < height + marginH;
+        if (isVisible && item.img.complete && item.img.naturalWidth !== 0) {
           ctx.save();
           ctx.translate(item.x, item.y);
           ctx.rotate(item.rotation);
@@ -261,6 +337,7 @@ export default function FloatingVegetables2D() {
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       resizeObserver.disconnect();
     };
   }, []);

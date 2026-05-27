@@ -6,6 +6,16 @@ Este documento foi pensado especialmente para **desenvolvedores que estão ingre
 
 ---
 
+## 📚 Documentações Importantes
+
+Para facilitar a sua ambientação e garantir a conformidade do código, consulte os guias abaixo:
+
+*   📖 **[Guia de Diretrizes de Desenvolvimento](file:///c:/Documentos/DoeJA/docs/DEVELOPER_GUIDELINES.md):** Manual completo de boas práticas, estrutura de código, regras do Tailwind v4, otimização de imagens/LCP e instruções de performance.
+*   🎨 **[Guia do Design System](file:///c:/Documentos/DoeJA/DESIGN.md):** Especificações de cores, tipografia, espaçamentos, sombras e identidade de marca.
+*   🤖 **[Regras de Agentes (Pair Programming)](file:///c:/Documentos/DoeJA/AGENTS.md):** Padrões e diretrizes locais para assistentes de inteligência artificial de pair programming.
+
+---
+
 ## 🚀 1. Configurando e Executando o Projeto Localmente
 
 Antes de começar, certifique-se de ter o **Node.js** instalado na sua máquina (recomendamos a versão LTS recente).
@@ -199,6 +209,14 @@ Crie os arquivos de teste na mesma pasta onde está a lógica ou componente, uti
     });
     ```
 
+### Testes de Performance (FPS Automatizado) 📈
+Garantimos a fluidez e estabilidade da animação rodando testes automatizados com o Puppeteer.
+*   **Como executar:**
+    ```bash
+    node scripts/measure-fps.mjs
+    ```
+    Esse script executa simulações completas de scroll e movimentação do mouse, medindo a taxa de quadros e validando que a média permanece $\ge$ 60 FPS.
+
 ---
 
 ## 🚨 6. Checklist de Pré-Commit (Não Esqueça!)
@@ -220,5 +238,10 @@ Antes de subir seu código (dar o `git push`) e abrir um Pull Request, execute l
     npm run build
     ```
     *(Garante que o TypeScript não possui erros de tipo implícitos ou incompatibilidades estruturais)*
+4.  **Valide o Desempenho de Renderização (60 FPS):**
+    ```bash
+    node scripts/measure-fps.mjs
+    ```
+    *(Garante que as novas mudanças não introduziram lags e o app roda liso a 60+ FPS)*
 
 Seguindo este guia, você garantirá que o projeto continue limpo, rápido e seguro para todos os usuários e desenvolvedores! Se tiver dúvidas, procure o Arthur ou mande no canal de comunicação da equipe. Boa codificação! 🚀

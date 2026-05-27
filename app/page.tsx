@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
@@ -20,7 +19,7 @@ export default function Home() {
 
       <main className="relative min-h-screen flex flex-col items-center pt-md md:pt-0 bg-background text-on-surface overflow-hidden">
         {/* Global background floating animation */}
-        <div className="absolute inset-0 -top-24 z-0 pointer-events-none opacity-85">
+        <div className="fixed inset-0 z-0 pointer-events-none opacity-85">
           <FloatingVegetables2D />
         </div>
 
@@ -40,13 +39,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative flex justify-center items-center h-[220px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-full max-w-3xl mx-auto mt-2 md:mt-6">
-              <Image
+            <div className="flex justify-center items-center w-full max-w-3xl mx-auto mt-2 md:mt-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/logo.svg"
                 alt="Logo DoeJÁ"
-                fill
-                className="object-contain object-center"
-                priority
+                className="h-[220px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-auto object-contain"
               />
             </div>
 
@@ -64,7 +62,7 @@ export default function Home() {
         {/* Bento Grid Section (Value Props) */}
         <section className="relative z-10 w-full max-w-7xl px-margin-mobile md:px-margin-desktop py-xl mt-lg grid grid-cols-1 md:grid-cols-3 gap-md">
           {/* Card 1 (colspan-2) - Soft Green */}
-          <ScrollReveal className="md:col-span-2 group tactile-card bg-[#edf2e2]/60 backdrop-blur-md border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
+          <ScrollReveal className="md:col-span-2 group tactile-card bg-[#edf2e2]/95 border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-headline-lg text-headline-lg text-primary">
                 Transparência Total
@@ -82,7 +80,7 @@ export default function Home() {
           </ScrollReveal>
 
           {/* Card 2 - Soft Orange */}
-          <ScrollReveal className="group tactile-card bg-[#fff1eb]/60 backdrop-blur-md border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
+          <ScrollReveal className="group tactile-card bg-[#fff1eb]/95 border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
               <BadgeCheckIcon
                 size={48}
@@ -100,7 +98,7 @@ export default function Home() {
           </ScrollReveal>
 
           {/* Card 3 - Soft Green */}
-          <ScrollReveal className="group tactile-card bg-[#edf2e2]/60 backdrop-blur-md border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
+          <ScrollReveal className="group tactile-card bg-[#edf2e2]/95 border border-[#4d6617]/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
               <UsersRoundIcon
                 size={48}
@@ -118,7 +116,7 @@ export default function Home() {
           </ScrollReveal>
 
           {/* Card 4 (colspan-2) - Soft Orange */}
-          <ScrollReveal className="md:col-span-2 group tactile-card bg-[#fff1eb]/60 backdrop-blur-md border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
+          <ScrollReveal className="md:col-span-2 group tactile-card bg-[#fff1eb]/95 border border-[#8c4f00]/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-headline-lg text-headline-lg text-secondary">
                 Seja um Parceiro

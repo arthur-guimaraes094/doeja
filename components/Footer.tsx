@@ -1,21 +1,18 @@
 import React from "react";
-import Image from "next/image";
 import { GlobeIcon, ShareIcon } from "./Icons";
 
 export default function Footer() {
   return (
-    <footer className="w-full relative mt-xl border-t border-surface-variant bg-[#edf2e2]/80 backdrop-blur-md min-h-[140px] pb-10">
+    <footer className="w-full relative mt-xl border-t border-surface-variant bg-[#edf2e2] min-h-[140px] pb-10">
       {/* Main Footer Content */}
       <div className="relative z-10 flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop pt-lg pb-4 space-y-md md:space-y-0 max-w-7xl mx-auto">
         
-          <div className="relative h-10 w-28 mb-1">
-            <Image 
-              src="/logo.svg" 
-              alt="Logo DoeJÁ" 
-              fill
-              className="object-contain object-center md:object-left"
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/logo.svg" 
+            alt="Logo DoeJÁ" 
+            className="h-10 w-auto object-contain mb-1"
+          />
           <p className="font-label-md text-label-md text-on-surface-variant text-center md:text-left">
             © 2026 DoeJÁ. Conectando generosidade a quem precisa.
           </p>
