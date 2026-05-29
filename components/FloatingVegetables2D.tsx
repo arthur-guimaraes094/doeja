@@ -355,7 +355,7 @@ export default function FloatingVegetables2D() {
     <canvas
       ref={canvasRef}
       className="w-full h-full pointer-events-none"
-      aria-label="Fundo de vegetais e frutas 2D flutuantes com interatividade"
+      aria-hidden="true"
     />
   );
 }

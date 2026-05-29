@@ -16,6 +16,49 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.doeja.me"),
   title: "DoeJÁ - Conectando doadores de alimentos a ONGs",
   description: "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
+  keywords: [
+    "doação de alimentos",
+    "combate à fome",
+    "ong de alimentos",
+    "doar comida",
+    "solidariedade",
+    "DoeJÁ",
+    "segurança alimentar",
+    "instituições de caridade"
+  ],
+  openGraph: {
+    title: "DoeJÁ - Conectando doadores de alimentos a ONGs",
+    description: "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
+    url: "https://www.doeja.me",
+    siteName: "DoeJÁ",
+    locale: "pt_BR",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DoeJÁ - Conectando doadores de alimentos a ONGs"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DoeJÁ - Conectando doadores de alimentos a ONGs",
+    description: "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
+    images: ["/twitter-image.png"]
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
+  }
 };
 
 export default function RootLayout({
