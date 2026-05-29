@@ -54,7 +54,7 @@
   /* Fonts */
   --font-sans: var(--font-plus-jakarta), sans-serif;
   --font-plus-jakarta: var(--font-plus-jakarta), sans-serif;
-  --font-display: var(--font-fredoka), sans-serif;
+  --font-display: var(--font-plus-jakarta), sans-serif;
 
   /* Spacing Grid (Stitch values) */
   --spacing-margin-desktop: 64px;
