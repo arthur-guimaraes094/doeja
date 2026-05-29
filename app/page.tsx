@@ -7,8 +7,32 @@ import { HeartHandshakeIcon } from "../components/Icons";
 import FloatingVegetables2D from "../components/FloatingVegetables2D";
 
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    "name": "DoeJÁ",
+    "url": "https://www.doeja.me",
+    "logo": "https://www.doeja.me/logo.svg",
+    "description": "Facilitamos a conexão rápida e segura entre doadores de alimentos e ONGs locais. Seu gesto pode mudar histórias.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "BR"
+    },
+    "knowsAbout": [
+      "Doação de Alimentos",
+      "Segurança Alimentar",
+      "Combate à Fome",
+      "Solidariedade",
+      "ONGs de Caridade"
+    ]
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <Header />
 
