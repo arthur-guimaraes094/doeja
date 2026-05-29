@@ -4,11 +4,11 @@
 @source ".";
 
 @theme {
-  --color-primary: #4d6617;
+  --color-primary: #3f5413;
   --color-on-primary: #ffffff;
   --color-primary-container: #a8c66c;
   --color-on-primary-container: #3b5201;
-  --color-secondary: #8c4f00;
+  --color-secondary: #814900;
   --color-secondary-container: #fd9923;
   --color-on-secondary-container: #663800;
   --color-tertiary: #2c6a4a;
