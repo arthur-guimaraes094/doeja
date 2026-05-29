@@ -2,13 +2,8 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
-import {
-  TrendingUpIcon,
-  BadgeCheckIcon,
-  UsersRoundIcon,
-  HandshakeIcon,
-  HeartHandshakeIcon,
-} from "../components/Icons";
+import Parallax from "../components/Parallax";
+import { HeartHandshakeIcon } from "../components/Icons";
 import FloatingVegetables2D from "../components/FloatingVegetables2D";
 
 export default function Home() {
@@ -27,7 +22,7 @@ export default function Home() {
         <section className="relative w-full min-h-0 h-[calc(100svh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">
           <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-sm md:space-y-lg w-full flex flex-col items-center">
             <div className="space-y-sm md:space-y-md">
-              <h1 className="font-display-lg text-[40px] md:text-[48px] font-extrabold leading-tight text-on-background">
+              <h1 className="font-display text-[40px] md:text-[48px] font-bold leading-tight text-on-background">
                 Seu gesto pode mudar histórias
               </h1>
               <p className="font-headline-md text-[20px] md:text-[24px] text-on-surface-variant">
@@ -39,20 +34,20 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex justify-center items-center w-full max-w-3xl mx-auto mt-2 md:mt-6">
+            <Parallax speed={-0.08} className="flex justify-center items-center w-full max-w-3xl mx-auto mt-2 md:mt-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo.svg"
                 alt="Logo DoeJÁ"
                 className="h-[220px] md:h-[32vh] md:max-h-[320px] md:min-h-[200px] w-auto object-contain"
               />
-            </div>
+            </Parallax>
 
             <div className="flex flex-col sm:flex-row gap-sm md:gap-md justify-center pt-xs md:pt-md">
-              <button className="bg-primary text-on-primary px-10 py-4 rounded-full font-headline-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
+              <button className="bg-primary text-on-primary px-10 py-4 rounded-full font-display font-medium text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
                 Quero Doar Agora
               </button>
-              <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-headline-md bg-white hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
+              <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-display font-medium text-lg bg-white hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
                 Ver Projetos
               </button>
             </div>
@@ -64,7 +59,7 @@ export default function Home() {
           {/* Card 1 (colspan-2) - Soft Green */}
           <ScrollReveal className="md:col-span-2 group tactile-card bg-[#edf2e2]/95 border border-primary/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
-              <h3 className="font-headline-lg text-headline-lg text-primary">
+              <h3 className="font-display text-2xl md:text-3xl font-bold text-primary">
                 Transparência Total
               </h3>
               <p className="font-body-lg text-body-lg text-on-surface-variant">
@@ -72,22 +67,24 @@ export default function Home() {
                 fotos do impacto real nas comunidades atendidas.
               </p>
             </div>
-            <TrendingUpIcon
-              size={88}
-              className="text-primary shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6"
-              aria-hidden="true"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/transparencia.webp"
+              alt="Ilustração de Transparência Total"
+              className="h-28 w-auto object-contain shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6"
             />
           </ScrollReveal>
 
           {/* Card 2 - Soft Orange */}
           <ScrollReveal className="group tactile-card bg-surface-container-low/95 border border-secondary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <BadgeCheckIcon
-                size={48}
-                className="text-secondary transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-                aria-hidden="true"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/coracao-verificado.webp"
+                alt="Selo de ONG Verificada"
+                className="h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
               />
-              <h3 className="font-headline-md text-headline-md text-secondary">
+              <h3 className="font-display text-xl md:text-2xl font-bold text-secondary">
                 ONGs Verificadas
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
@@ -100,12 +97,13 @@ export default function Home() {
           {/* Card 3 - Soft Green */}
           <ScrollReveal className="group tactile-card bg-[#edf2e2]/95 border border-primary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <UsersRoundIcon
-                size={48}
-                className="text-primary transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
-                aria-hidden="true"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/comunidade.webp"
+                alt="Ilustração de Comunidade Viva"
+                className="h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
               />
-              <h3 className="font-headline-md text-headline-md text-primary">
+              <h3 className="font-display text-xl md:text-2xl font-bold text-primary">
                 Comunidade Viva
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
@@ -118,7 +116,7 @@ export default function Home() {
           {/* Card 4 (colspan-2) - Soft Orange */}
           <ScrollReveal className="md:col-span-2 group tactile-card bg-surface-container-low/95 border border-secondary/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
-              <h3 className="font-headline-lg text-headline-lg text-secondary">
+              <h3 className="font-display text-2xl md:text-3xl font-bold text-secondary">
                 Seja um Parceiro
               </h3>
               <p className="font-body-lg text-body-lg text-on-surface-variant">
@@ -129,10 +127,11 @@ export default function Home() {
                 Saber Mais
               </button>
             </div>
-            <HandshakeIcon
-              size={88}
-              className="text-secondary shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
-              aria-hidden="true"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/parceria.webp"
+              alt="Ilustração de Parceria"
+              className="h-28 w-auto object-contain shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
             />
           </ScrollReveal>
         </section>

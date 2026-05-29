@@ -4,90 +4,95 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string;
 }
 
-export function HandshakeIcon({ size = 24, className, ...props }: IconProps) {
+export function HandshakeIcon({ size = 88, className, ...props }: IconProps) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 100 100"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}
     >
-      <path d="m11 17 2 2a1 1 0 1 0 3-3" />
-      <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
-      <path d="m21 3 1 11h-2" />
-      <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
-      <path d="M3 4h8" />
+      {/* Two hands shaking, one green, one orange */}
+      <path d="M10 40 L35 40 Q40 40 43 45 L55 58" stroke="#814900" strokeWidth="6" strokeLinecap="round" />
+      <path d="M90 40 L65 40 Q60 40 57 45 L45 58" stroke="#3f5413" strokeWidth="6" strokeLinecap="round" />
+      {/* Handshake fingers block */}
+      <rect x="42" y="42" width="16" height="24" rx="8" fill="#fff8f6" stroke="#814900" strokeWidth="4" />
+      <line x1="46" y1="48" x2="54" y2="48" stroke="#814900" strokeWidth="3" strokeLinecap="round" />
+      <line x1="46" y1="54" x2="54" y2="54" stroke="#814900" strokeWidth="3" strokeLinecap="round" />
+      <line x1="46" y1="60" x2="54" y2="60" stroke="#814900" strokeWidth="3" strokeLinecap="round" />
+      {/* Cute sparkles */}
+      <path d="M25 20 L27 25 L32 27 L27 29 L25 34 L23 29 L18 27 L23 25 Z" fill="#fd9923" />
+      <path d="M75 22 L77 25 L82 27 L77 29 L75 34 L73 29 L68 27 L73 25 Z" fill="#a8c66c" />
     </svg>
   );
 }
 
-export function BadgeCheckIcon({ size = 24, className, ...props }: IconProps) {
+export function BadgeCheckIcon({ size = 48, className, ...props }: IconProps) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 60 60"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}
     >
-      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-      <path d="m9 12 2 2 4-4" />
+      {/* Heart badge */}
+      <path d="M30 52 C5 40 5 15 30 10 C55 15 55 40 30 52 Z" fill="#fff8f6" stroke="#814900" strokeWidth="4" strokeLinejoin="round" />
+      {/* Seal checkmark in primary green/secondary orange */}
+      <circle cx="30" cy="28" r="14" fill="#a8c66c" stroke="#3f5413" strokeWidth="3" />
+      <path d="M25 28 L28 31 L35 24" stroke="#3f5413" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-export function TrendingUpIcon({ size = 24, className, ...props }: IconProps) {
+export function TrendingUpIcon({ size = 88, className, ...props }: IconProps) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 100 100"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}
     >
-      <path d="M16 7h6v6" />
-      <path d="m22 7-8.5 8.5-5-5L2 17" />
+      {/* Sprout plant growing */}
+      <path d="M50 85 V35" stroke="#3f5413" strokeWidth="6" strokeLinecap="round" />
+      <path d="M50 65 Q30 55 32 40 Q45 40 50 55" fill="#a8c66c" stroke="#3f5413" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M50 50 Q70 40 68 25 Q55 25 50 40" fill="#a8c66c" stroke="#3f5413" strokeWidth="4" strokeLinejoin="round" />
+      {/* Transparent glass dome or magnifying glass over it */}
+      <circle cx="50" cy="45" r="35" stroke="#3f5413" strokeWidth="4" strokeDasharray="6 4" fill="rgba(168, 198, 108, 0.1)" />
+      <path d="M75 70 L90 85" stroke="#3f5413" strokeWidth="6" strokeLinecap="round" />
     </svg>
   );
 }
 
-export function UsersRoundIcon({ size = 24, className, ...props }: IconProps) {
+export function UsersRoundIcon({ size = 48, className, ...props }: IconProps) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 60 60"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}
     >
-      <path d="M18 21a8 8 0 0 0-16 0" />
-      <circle cx="10" cy="8" r="5" />
-      <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3" />
+      {/* Hugging bodies */}
+      <path d="M8 52 C8 40, 28 40, 28 52" fill="#fd9923" stroke="#814900" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M32 52 C32 40, 52 40, 52 52" fill="#a8c66c" stroke="#3f5413" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M16 48 C16 35, 44 35, 44 48" fill="#fff8f6" stroke="#814900" strokeWidth="3.5" strokeLinecap="round" />
+      {/* Heads */}
+      <circle cx="18" cy="28" r="7" fill="#fd9923" stroke="#814900" strokeWidth="3" />
+      <circle cx="42" cy="28" r="7" fill="#a8c66c" stroke="#3f5413" strokeWidth="3" />
+      <circle cx="30" cy="24" r="8" fill="#fff8f6" stroke="#814900" strokeWidth="3" />
+      {/* Floating Heart */}
+      <path d="M30 12 C28.5 9.5, 25 9.5, 25 13 C25 17, 30 20, 30 21 C30 20, 35 17, 35 13 C35 9.5, 31.5 9.5, 30 12 Z" fill="#814900" />
     </svg>
   );
 }
