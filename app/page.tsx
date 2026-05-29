@@ -9,7 +9,7 @@ import { HeartHandshakeIcon } from "../components/Icons";
 import FloatingVegetables2D from "../components/FloatingVegetables2D";
 import { gsap, useGSAP } from "@/lib/gsap";
 import Magnetic from "../components/Magnetic";
-import SplitText from "../components/SplitText";
+import KineticText from "../components/KineticText";
 import ImageReveal from "../components/ImageReveal";
 import Preloader from "../components/Preloader";
 
@@ -84,8 +84,8 @@ export default function Home() {
         <section className="relative w-full min-h-0 h-[calc(100svh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">
           <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-sm md:space-y-lg w-full flex flex-col items-center">
             <div className="space-y-sm md:space-y-md">
-              <h1 className="font-display text-[40px] md:text-[48px] font-bold leading-tight text-on-background">
-                <SplitText text="Seu gesto pode mudar histórias" start={!preloaderActive} />
+              <h1 className="font-display text-[40px] md:text-[48px] font-medium leading-tight text-on-background">
+                <KineticText text="Seu gesto pode mudar histórias" start={!preloaderActive} />
               </h1>
               <p className="hero-subtitle font-headline-md text-[20px] md:text-[24px] text-on-surface" style={{ opacity: 0 }}>
                 <span className="text-primary font-extrabold">Doe</span>
