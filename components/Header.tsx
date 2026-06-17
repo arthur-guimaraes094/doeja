@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -52,7 +53,7 @@ export default function Header() {
         
         <div className="flex items-center gap-md">
           <button className="hidden md:block font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Conta</button>
-          <button className="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full font-headline-md text-body-md shadow-md hover:scale-95 transition-transform">Login</button>
+          <Link href="/login" className="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full font-headline-md text-body-md shadow-md hover:scale-95 transition-transform">Login</Link>
         </div>
       </div>
     </header>

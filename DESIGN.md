@@ -16,12 +16,12 @@ colors:
   outline: '#757969'
   outline-variant: '#c5c8b6'
   surface-tint: '#4d6617'
-  primary: '#4d6617'
+  primary: '#3f5413'
   on-primary: '#ffffff'
   primary-container: '#a8c66c'
   on-primary-container: '#3b5201'
   inverse-primary: '#b3d176'
-  secondary: '#8c4f00'
+  secondary: '#814900'
   on-secondary: '#ffffff'
   secondary-container: '#fd9923'
   on-secondary-container: '#663800'
@@ -153,8 +153,8 @@ The shape language is consistently **Rounded**. There are no sharp corners in th
 ## Components
 
 ### Buttons
-*   **Primary:** Solid Orange (#F7941D) with Deep Forest (#1D5C3E) or White text for maximum contrast. High-elevation shadow on hover.
-*   **Secondary:** Solid White or Cream with Green (#A8C66C) text and a 2px Green border.
+*   **Primary:** Solid Orange (#fd9923 / #814900) with Deep Forest (#2c6a4a) or White text for maximum contrast. High-elevation shadow on hover.
+*   **Secondary:** Solid White or Cream with Green text and border (#3f5413 / #a8c66c).
 *   **Tertiary/Ghost:** Text-only with an underline or icon, used for less frequent actions like "Forgot Password."
 
 ### Input Fields

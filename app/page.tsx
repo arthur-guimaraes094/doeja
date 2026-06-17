@@ -11,15 +11,11 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import Magnetic from "../components/Magnetic";
 import KineticText from "../components/KineticText";
 import ImageReveal from "../components/ImageReveal";
-import Preloader from "../components/Preloader";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [preloaderActive, setPreloaderActive] = useState(true);
 
   useGSAP(() => {
-    if (preloaderActive) return;
-
     const tl = gsap.timeline();
 
     tl.fromTo(
@@ -40,7 +36,7 @@ export default function Home() {
         { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.1 },
         "-=0.6"
       );
-  }, { scope: containerRef, dependencies: [preloaderActive] });
+  }, { scope: containerRef, dependencies: [] });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -68,9 +64,6 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Awwwards Intro Preloader */}
-      <Preloader onComplete={() => setPreloaderActive(false)} />
-
       {/* Header */}
       <Header />
 
@@ -85,7 +78,7 @@ export default function Home() {
           <div className="relative z-10 max-w-4xl px-margin-mobile text-center space-y-sm md:space-y-lg w-full flex flex-col items-center">
             <div className="space-y-sm md:space-y-md">
               <h1 className="font-display text-[40px] md:text-[48px] font-medium leading-tight text-on-background">
-                <KineticText text="Seu gesto pode mudar histórias" start={!preloaderActive} />
+                <KineticText text="Seu gesto pode mudar histórias" start={true} />
               </h1>
               <p className="hero-subtitle font-headline-md text-[20px] md:text-[24px] text-on-surface" style={{ opacity: 0 }}>
                 <span className="text-primary font-extrabold">Doe</span>
