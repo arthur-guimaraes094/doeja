@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 
 interface KineticTextProps {
@@ -17,7 +17,7 @@ export default function KineticText({
   start = true 
 }: KineticTextProps) {
   const containerRef = useRef<HTMLSpanElement>(null);
-  const [isMobile, setIsMobile] = useState(true);
+
 
   // Declare proximity helper function at the top of component scope so it is naturally hoisted
   function initProximityEffect(chars: NodeListOf<Element>) {
@@ -140,15 +140,6 @@ export default function KineticText({
     };
   }
 
-  useEffect(() => {
-    // Check if the device has a mouse/trackpad pointer asynchronously to prevent cascading render warnings
-    const checkTouch = !window.matchMedia("(pointer: fine)").matches;
-    const frameId = requestAnimationFrame(() => {
-      setIsMobile(checkTouch);
-    });
-    return () => cancelAnimationFrame(frameId);
-  }, []);
-
   useGSAP(() => {
     if (!start) return;
     const chars = containerRef.current?.querySelectorAll(".char-inner");
@@ -172,13 +163,14 @@ export default function KineticText({
           });
 
           // Initialize proximity interactions once entry animation finishes (desktop only)
-          if (!isMobile) {
+          const isTouch = !window.matchMedia("(pointer: fine)").matches;
+          if (!isTouch) {
             initProximityEffect(chars);
           }
         }
       }
     );
-  }, { scope: containerRef, dependencies: [start, isMobile] });
+  }, { scope: containerRef, dependencies: [start] });
 
   // Cleanup on unmount (with copied ref target to avoid layout/unmount race conditions)
   useEffect(() => {

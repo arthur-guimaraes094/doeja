@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
 import Parallax from "../components/Parallax";
 import { HeartHandshakeIcon } from "../components/Icons";
-import FloatingVegetables2D from "../components/FloatingVegetables2D";
 import { gsap, useGSAP } from "@/lib/gsap";
 import Magnetic from "../components/Magnetic";
 import KineticText from "../components/KineticText";
 import ImageReveal from "../components/ImageReveal";
+
+const FloatingVegetables2D = dynamic(
+  () => import("../components/FloatingVegetables2D"),
+  { ssr: false }
+);
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);

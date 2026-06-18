@@ -2,12 +2,19 @@
 
 import React, { useRef, useState } from "react";
 import Link from "next/link";
-import FloatingVegetables2D from "@/components/FloatingVegetables2D";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { gsap, useGSAP } from "@/lib/gsap";
+
+const FloatingVegetables2D = dynamic(
+  () => import("@/components/FloatingVegetables2D"),
+  { ssr: false }
+);
 
 export default function LoginPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     identifier: "",
@@ -23,6 +30,20 @@ export default function LoginPage() {
       { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power4.out" }
     );
   }, { scope: containerRef });
+
+  const handleExit = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    gsap.to(cardRef.current, {
+      opacity: 0,
+      y: 40,
+      scale: 0.95,
+      duration: 0.6,
+      ease: "power4.in",
+      onComplete: () => {
+        router.push(href);
+      },
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -57,7 +78,11 @@ export default function LoginPage() {
         {/* Left Panel - Brand Showcase (Hidden on Mobile) */}
         <div className="hidden md:flex md:col-span-5 bg-primary-container flex-col justify-between p-10 text-primary relative">
           {/* Logo */}
-          <Link href="/" className="inline-block transition-transform hover:scale-105 duration-200">
+          <Link
+            href="/"
+            onClick={(e) => handleExit(e, "/")}
+            className="inline-block transition-transform hover:scale-105 duration-200"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Logo DoeJÁ" className="h-10 w-auto object-contain" />
           </Link>
@@ -87,7 +112,7 @@ export default function LoginPage() {
           <div className="flex justify-between items-center w-full mb-6">
             {/* Mobile Logo */}
             <div className="md:hidden flex items-center">
-              <Link href="/">
+              <Link href="/" onClick={(e) => handleExit(e, "/")}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/logo.svg" alt="Logo DoeJÁ" className="h-9 w-auto object-contain" />
               </Link>
@@ -96,6 +121,7 @@ export default function LoginPage() {
             {/* Back Button */}
             <Link
               href="/"
+              onClick={(e) => handleExit(e, "/")}
               className="absolute top-6 right-8 text-on-surface-variant/70 hover:text-primary transition-all duration-200 flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full hover:bg-primary-container/20"
             >
               <svg

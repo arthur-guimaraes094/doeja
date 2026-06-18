@@ -91,6 +91,9 @@ export default function FloatingVegetables2D() {
       }
     };
 
+    // Cache bounding rect to avoid layout thrashing on mousemove
+    let rect = canvas.getBoundingClientRect();
+
     // Resize Observer to keep canvas buffer and layout sizes synchronized
     // Scale buffer by devicePixelRatio for sharp rendering on Retina/HiDPI screens
     const resizeObserver = new ResizeObserver((entries) => {
@@ -115,6 +118,9 @@ export default function FloatingVegetables2D() {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = isMobile ? "medium" : "high";
         
+        // Update cached rect when dimensions change
+        rect = canvas.getBoundingClientRect();
+
         // Only re-initialize items if it is the first load or if the width changed (e.g. orientation changes).
         // This prevents items from flashing/resetting when the browser address bar collapses/expands on scroll.
         if (isFirstInit || widthChanged) {
@@ -130,7 +136,6 @@ export default function FloatingVegetables2D() {
     let mouseY = -9999;
 
     const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
       mouseX = event.clientX - rect.left;
       mouseY = event.clientY - rect.top;
     };
