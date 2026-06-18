@@ -19,6 +19,7 @@ export default function FloatingVegetables2D() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (window.innerWidth < 768) return;
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -359,7 +360,7 @@ export default function FloatingVegetables2D() {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full pointer-events-none"
+      className="hidden md:block w-full h-full pointer-events-none"
       aria-hidden="true"
     />
   );

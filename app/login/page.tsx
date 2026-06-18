@@ -27,7 +27,7 @@ export default function LoginPage() {
     tl.fromTo(
       cardRef.current,
       { opacity: 0, y: 40, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power4.out" }
+      { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
     );
   }, { scope: containerRef });
 
@@ -38,7 +38,7 @@ export default function LoginPage() {
       y: 40,
       scale: 0.95,
       duration: 0.6,
-      ease: "power4.in",
+      ease: "power2.in",
       onComplete: () => {
         router.push(href);
       },
@@ -73,7 +73,7 @@ export default function LoginPage() {
       <div
         ref={cardRef}
         style={{ opacity: 0 }}
-        className="relative grid grid-cols-1 md:grid-cols-12 w-full max-w-4xl min-h-[580px] bg-white border border-[#4d6617]/10 rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl z-10"
+        className="relative grid grid-cols-1 md:grid-cols-12 w-full max-w-4xl min-h-[580px] bg-white border border-surface-tint/10 rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl z-10"
       >
         {/* Left Panel - Brand Showcase (Hidden on Mobile) */}
         <div className="hidden md:flex md:col-span-5 bg-primary-container flex-col justify-between p-10 text-primary relative">
@@ -93,7 +93,7 @@ export default function LoginPage() {
             <img
               src="/caixa-doacao.webp"
               alt="Caixa de doação de alimentos DoeJÁ"
-              className="w-[90%] h-auto max-h-[260px] object-contain drop-shadow-[0_10px_15px_rgba(63,84,19,0.15)] animate-[float_6s_ease-in-out_infinite]"
+              className="w-[90%] h-auto max-h-[260px] object-contain drop-shadow-[0_10px_15px_rgba(63,84,19,0.15)]"
             />
           </div>
 
