@@ -12,10 +12,7 @@ import Magnetic from "../components/Magnetic";
 import KineticText from "../components/KineticText";
 import ImageReveal from "../components/ImageReveal";
 
-const FloatingVegetables2D = dynamic(
-  () => import("../components/FloatingVegetables2D"),
-  { ssr: false }
-);
+// FloatingVegetables2D is rendered persistently in layout.tsx
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,10 +70,7 @@ export default function Home() {
       <Header />
 
       <main ref={containerRef} className="relative min-h-screen flex flex-col items-center pt-md md:pt-0 text-on-surface overflow-hidden">
-        {/* Global background floating animation */}
-        <div className="fixed inset-0 -z-10 pointer-events-none opacity-85">
-          <FloatingVegetables2D />
-        </div>
+        {/* Global background floating animation is rendered persistently by layout.tsx */}
 
         {/* Hero Section */}
         <section className="relative w-full min-h-0 h-[calc(100svh-72px)] md:h-[calc(100vh-72px)] flex items-center justify-center py-4 md:py-8 z-10">

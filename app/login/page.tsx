@@ -3,22 +3,32 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { gsap, useGSAP } from "@/lib/gsap";
-
-const FloatingVegetables2D = dynamic(
-  () => import("@/components/FloatingVegetables2D"),
-  { ssr: false }
-);
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const [isLoginTab, setIsLoginTab] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
   const [formData, setFormData] = useState({
-    identifier: "",
+    email: "",
     password: "",
+    nome: "",
+    telefone: "",
+    // Address components
+    cep: "",
+    rua: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
     rememberMe: false,
   });
 
@@ -26,8 +36,8 @@ export default function LoginPage() {
     const tl = gsap.timeline();
     tl.fromTo(
       cardRef.current,
-      { opacity: 0, y: 40, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }
     );
   }, { scope: containerRef });
 
@@ -35,9 +45,8 @@ export default function LoginPage() {
     e.preventDefault();
     gsap.to(cardRef.current, {
       opacity: 0,
-      y: 40,
-      scale: 0.95,
-      duration: 0.6,
+      y: 12,
+      duration: 0.2,
       ease: "power2.in",
       onComplete: () => {
         router.push(href);
@@ -53,10 +62,140 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const cleanCep = rawValue.replace(/\D/g, "");
+    
+    // Format mask: 00000-000
+    let formattedCep = cleanCep;
+    if (cleanCep.length > 5) {
+      formattedCep = `${cleanCep.slice(0, 5)}-${cleanCep.slice(5, 8)}`;
+    }
+
+    setFormData((prev) => ({ ...prev, cep: formattedCep }));
+
+    if (cleanCep.length === 8) {
+      try {
+        setErrorMsg("");
+        const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = await res.json();
+        
+        if (data.erro) {
+          setErrorMsg("CEP não encontrado.");
+          return;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          rua: data.logradouro || "",
+          bairro: data.bairro || "",
+          cidade: data.localidade || "",
+          estado: data.uf || "",
+        }));
+      } catch (err) {
+        console.error("Erro ao buscar CEP:", err);
+        setErrorMsg("Erro de conexão ao buscar o CEP.");
+      }
+    }
+  };
+
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const cleanValue = rawValue.replace(/\D/g, "");
+    
+    let formattedValue = "";
+    if (cleanValue.length > 0) {
+      formattedValue = `(${cleanValue.slice(0, 2)}`;
+      
+      if (cleanValue.length > 2) {
+        formattedValue += `) ${cleanValue.slice(2, 6)}`;
+      }
+      if (cleanValue.length > 6) {
+        if (cleanValue.length <= 10) {
+          formattedValue = `(${cleanValue.slice(0, 2)}) ${cleanValue.slice(2, 6)}-${cleanValue.slice(6, 10)}`;
+        } else {
+          formattedValue = `(${cleanValue.slice(0, 2)}) ${cleanValue.slice(2, 7)}-${cleanValue.slice(7, 11)}`;
+        }
+      }
+    }
+    
+    setFormData((prev) => ({ ...prev, telefone: formattedValue }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting login form:", formData);
-    // Add auth logic here when needed
+    setErrorMsg("");
+    setSuccessMsg("");
+    setLoading(true);
+
+    try {
+      if (isLoginTab) {
+        // LOGIN Flow
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        setSuccessMsg("Conexão estabelecida com sucesso! Redirecionando...");
+        setTimeout(() => {
+          router.push("/");
+        }, 1200);
+      } else {
+        // CADASTRO (Register) Flow
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              nome: formData.nome,
+              telefone: formData.telefone,
+              cep: formData.cep,
+              rua: formData.rua,
+              numero: formData.numero,
+              complemento: formData.complemento,
+              bairro: formData.bairro,
+              cidade: formData.cidade,
+              estado: formData.estado,
+            },
+          },
+        });
+
+        if (error) throw error;
+
+        // Note: If email confirmation is enabled in Supabase dashboard, data.user will exist but session will be null.
+        const isConfirmed = data.session !== null;
+        if (isConfirmed) {
+          setSuccessMsg("Cadastro e login realizados com sucesso!");
+          setTimeout(() => {
+            router.push("/");
+          }, 1200);
+        } else {
+          setSuccessMsg("Cadastro realizado com sucesso! Verifique seu e-mail para ativar sua conta.");
+          setIsLoginTab(true);
+          // Clear registration fields
+          setFormData((prev) => ({
+            ...prev,
+            password: "",
+            nome: "",
+            telefone: "",
+            cep: "",
+            rua: "",
+            numero: "",
+            complemento: "",
+            bairro: "",
+            cidade: "",
+            estado: "",
+          }));
+        }
+      }
+    } catch (err: any) {
+      console.error("Auth process error:", err);
+      setErrorMsg(err.message || "Erro durante o processamento da autenticação.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,11 +203,6 @@ export default function LoginPage() {
       ref={containerRef}
       className="relative min-h-screen w-full flex items-center justify-center p-margin-mobile md:p-md text-on-surface overflow-hidden bg-background"
     >
-      {/* Dynamic backdrop canvas vegetable animations */}
-      <div className="fixed inset-0 -z-10 pointer-events-none opacity-80">
-        <FloatingVegetables2D />
-      </div>
-
       {/* Main Login Card */}
       <div
         ref={cardRef}
@@ -97,15 +231,15 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* "Bem-vindo!" Text */}
+          {/* Title Text */}
           <div>
             <h2 className="font-display text-4xl font-extrabold text-primary leading-tight tracking-tight">
-              Bem-vindo!
+              {isLoginTab ? "Bem-vindo!" : "Participe!"}
             </h2>
           </div>
         </div>
 
-        {/* Right Panel - Login Form */}
+        {/* Right Panel - Form */}
         <div className="col-span-1 md:col-span-7 bg-[#fff8f6] flex flex-col justify-between p-8 md:p-12 relative min-h-[480px] md:min-h-0">
           
           {/* Top Row: Mobile Logo / Back Link */}
@@ -143,16 +277,59 @@ export default function LoginPage() {
             {/* Header Title */}
             <div className="space-y-1">
               <h1 className="font-display text-4xl font-extrabold text-secondary tracking-tight">
-                Login
+                {isLoginTab ? "Login" : "Cadastro"}
               </h1>
               <p className="text-sm text-on-surface-variant font-medium">
-                Conecte-se para continuar espalhando solidariedade.
+                {isLoginTab
+                  ? "Conecte-se para continuar espalhando solidariedade."
+                  : "Crie sua conta para começar a doar ou apoiar."}
               </p>
             </div>
 
+            {/* Alert Messages */}
+            {errorMsg && (
+              <div className="bg-red-50 text-red-700 text-xs font-semibold px-4 py-2.5 rounded-xl border border-red-200">
+                {errorMsg}
+              </div>
+            )}
+            {successMsg && (
+              <div className="bg-green-50 text-green-700 text-xs font-semibold px-4 py-2.5 rounded-xl border border-green-200">
+                {successMsg}
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* CPF/CNPJ/Email Input */}
+              {/* Nome (Only for Cadastro) */}
+              {!isLoginTab && (
+                <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="w-5 h-5 text-on-surface-variant/40 shrink-0"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    name="nome"
+                    value={formData.nome}
+                    onChange={handleChange}
+                    placeholder="Nome Completo"
+                    required={!isLoginTab}
+                    className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                  />
+                </div>
+              )}
+
+              {/* Email Input */}
               <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -165,15 +342,15 @@ export default function LoginPage() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
                   />
                 </svg>
                 <input
-                  type="text"
-                  name="identifier"
-                  value={formData.identifier}
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="CPF, CNPJ ou E-mail"
+                  placeholder="E-mail"
                   required
                   className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
                 />
@@ -206,52 +383,197 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Checkbox and Forgot Password */}
-              <div className="flex justify-between items-center text-xs font-semibold text-on-surface-variant px-2 pt-1 select-none">
-                <label className="flex items-center gap-2.5 cursor-pointer hover:text-primary transition-colors group">
-                  <div className="relative flex items-center justify-center">
-                    <input
-                      type="checkbox"
-                      name="rememberMe"
-                      checked={formData.rememberMe}
-                      onChange={handleChange}
-                      className="sr-only"
+              {/* Telefone (Only for Cadastro) */}
+              {!isLoginTab && (
+                <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="w-5 h-5 text-on-surface-variant/40 shrink-0"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.557-5.148-3.88-6.705-6.705l1.293-.97c.362-.272.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
                     />
-                    <div
-                      className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
-                        formData.rememberMe
-                          ? "bg-primary border-primary shadow-sm"
-                          : "border-outline-variant bg-white group-hover:border-primary"
-                      }`}
+                  </svg>
+                  <input
+                    type="tel"
+                    name="telefone"
+                    maxLength={15}
+                    value={formData.telefone}
+                    onChange={handleTelefoneChange}
+                    placeholder="Telefone"
+                    className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                  />
+                </div>
+              )}
+
+              {/* Endereço (Only for Cadastro) */}
+              {!isLoginTab && (
+                <div className="space-y-3 pt-2">
+                  <div className="text-xs font-bold text-secondary uppercase tracking-wider px-2">Endereço</div>
+                  
+                  {/* CEP */}
+                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="w-5 h-5 text-on-surface-variant/40 shrink-0"
                     >
-                      {formData.rememberMe && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="3.5"
-                          className="w-3.5 h-3.5"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                      )}
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1115 0z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      name="cep"
+                      maxLength={9}
+                      value={formData.cep}
+                      onChange={handleCepChange}
+                      placeholder="CEP (ex: 01001-000)"
+                      required={!isLoginTab}
+                      className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                    />
+                  </div>
+
+                  {/* Rua */}
+                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                    <input
+                      type="text"
+                      name="rua"
+                      value={formData.rua}
+                      onChange={handleChange}
+                      placeholder="Rua / Logradouro"
+                      required={!isLoginTab}
+                      className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                    />
+                  </div>
+
+                  {/* Número e Complemento */}
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="col-span-4 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                      <input
+                        type="text"
+                        name="numero"
+                        value={formData.numero}
+                        onChange={handleChange}
+                        placeholder="Nº"
+                        required={!isLoginTab}
+                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm text-center"
+                      />
+                    </div>
+                    <div className="col-span-8 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                      <input
+                        type="text"
+                        name="complemento"
+                        value={formData.complemento}
+                        onChange={handleChange}
+                        placeholder="Apto, Bloco..."
+                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm"
+                      />
                     </div>
                   </div>
-                  <span>Lembrar de mim</span>
-                </label>
-                <a href="#" className="hover:text-primary hover:underline transition-all duration-200">
-                  Esqueceu a senha?
-                </a>
-              </div>
 
-              {/* Login Button */}
+                  {/* Bairro */}
+                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                    <input
+                      type="text"
+                      name="bairro"
+                      value={formData.bairro}
+                      onChange={handleChange}
+                      placeholder="Bairro"
+                      required={!isLoginTab}
+                      className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                    />
+                  </div>
+
+                  {/* Cidade e Estado */}
+                  <div className="grid grid-cols-12 gap-3">
+                    <div className="col-span-8 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                      <input
+                        type="text"
+                        name="cidade"
+                        value={formData.cidade}
+                        onChange={handleChange}
+                        placeholder="Cidade"
+                        required={!isLoginTab}
+                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm"
+                      />
+                    </div>
+                    <div className="col-span-4 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                      <input
+                        type="text"
+                        name="estado"
+                        value={formData.estado}
+                        onChange={handleChange}
+                        placeholder="UF"
+                        required={!isLoginTab}
+                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm text-center"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Checkbox and Forgot Password (Only for Login) */}
+              {isLoginTab && (
+                <div className="flex justify-between items-center text-xs font-semibold text-on-surface-variant px-2 pt-1 select-none">
+                  <label className="flex items-center gap-2.5 cursor-pointer hover:text-primary transition-colors group">
+                    <div className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        name="rememberMe"
+                        checked={formData.rememberMe}
+                        onChange={handleChange}
+                        className="sr-only"
+                      />
+                      <div
+                        className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
+                          formData.rememberMe
+                            ? "bg-primary border-primary shadow-sm"
+                            : "border-outline-variant bg-white group-hover:border-primary"
+                        }`}
+                      >
+                        {formData.rememberMe && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="3.5"
+                            className="w-3.5 h-3.5"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <span>Lembrar de mim</span>
+                  </label>
+                  <a href="#" className="hover:text-primary hover:underline transition-all duration-200">
+                    Esqueceu a senha?
+                  </a>
+                </div>
+              )}
+
+              {/* Submit Button */}
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full bg-secondary hover:bg-[#975600] active:scale-[0.98] text-white py-3.5 rounded-full font-display font-bold text-base md:text-lg shadow-md hover:shadow-lg transition-all cursor-pointer text-center"
+                  disabled={loading}
+                  className="w-full bg-secondary hover:bg-[#975600] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-full font-display font-bold text-base md:text-lg shadow-md hover:shadow-lg transition-all cursor-pointer text-center"
                 >
-                  Login
+                  {loading ? "Processando..." : isLoginTab ? "Login" : "Cadastrar"}
                 </button>
               </div>
             </form>
@@ -266,15 +588,23 @@ export default function LoginPage() {
               </span>
             </div>
 
-            {/* Cadastre-se Button */}
+            {/* Switch Mode Button */}
             <div>
-              <button className="w-full bg-surface-container-highest hover:bg-[#e4d7d1] active:scale-[0.98] text-on-surface py-3.5 rounded-full font-display font-bold text-base md:text-lg transition-all border border-outline-variant/30 cursor-pointer">
-                Cadastre-se
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLoginTab(!isLoginTab);
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+                className="w-full bg-surface-container-highest hover:bg-[#e4d7d1] active:scale-[0.98] text-on-surface py-3.5 rounded-full font-display font-bold text-base md:text-lg transition-all border border-outline-variant/30 cursor-pointer"
+              >
+                {isLoginTab ? "Cadastre-se" : "Já tenho conta"}
               </button>
             </div>
           </div>
 
-          {/* Footer note / privacy info */}
+          {/* Footer note */}
           <div className="text-center text-[10px] text-on-surface-variant/50 pt-6">
             © {new Date().getFullYear()} DoeJÁ. Conectando pessoas e combatendo a fome.
           </div>

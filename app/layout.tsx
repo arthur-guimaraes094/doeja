@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import SmoothScroll from "../components/SmoothScroll";
 import PerformanceMonitor from "../components/PerformanceMonitor";
+import PersistentBackground from "../components/PersistentBackground";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -70,6 +71,7 @@ export default function RootLayout({
       <body>
         <SmoothScroll />
         <PerformanceMonitor />
+        <PersistentBackground />
         {children}
         <Analytics />
         <SpeedInsights />

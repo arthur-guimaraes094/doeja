@@ -495,10 +495,10 @@
         "required": ["nome"],
         "properties": {
           "id_usuario": {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
+            "format": "uuid",
             "readOnly": true,
-            "description": "Chave primária autoincrementável."
+            "description": "Identificador único (UUID) integrado ao Supabase Auth."
           },
           "nome": {
             "type": "string",
@@ -509,22 +509,21 @@
             "format": "email",
             "description": "Endereço de e-mail."
           },
-          "senha": {
-            "type": "string",
-            "description": "Senha cadastrada (campo legado/temporário)."
-          },
           "telefone": {
             "type": "string",
             "description": "Número de telefone."
-          },
-          "endereco": {
-            "type": "string",
-            "description": "Endereço cadastrado."
           },
           "data_cadastro": {
             "type": "string",
             "format": "date",
             "description": "Data de cadastro do usuário."
+          },
+          "enderecos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Endereco"
+            },
+            "description": "Lista de endereços associados ao usuário."
           }
         }
       },
@@ -538,14 +537,94 @@
             "type": "string",
             "format": "email"
           },
-          "senha": {
-            "type": "string"
-          },
           "telefone": {
             "type": "string"
+          }
+        }
+      },
+      "Endereco": {
+        "type": "object",
+        "required": ["cep", "rua", "numero", "bairro", "cidade", "estado"],
+        "properties": {
+          "id_endereco": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true,
+            "description": "Chave primária autoincrementável do endereço."
           },
-          "endereco": {
+          "id_usuario": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID do usuário associado."
+          },
+          "cep": {
+            "type": "string",
+            "description": "Código de Endereçamento Postal (CEP)."
+          },
+          "rua": {
+            "type": "string",
+            "description": "Logradouro/Rua."
+          },
+          "numero": {
+            "type": "string",
+            "description": "Número do imóvel."
+          },
+          "complemento": {
+            "type": "string",
+            "description": "Complemento do endereço."
+          },
+          "bairro": {
+            "type": "string",
+            "description": "Bairro."
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Cidade."
+          },
+          "estado": {
+            "type": "string",
+            "description": "Sigla do estado (UF)."
+          },
+          "identificador": {
+            "type": "string",
+            "description": "Nome personalizado do endereço (ex: Casa, Trabalho)."
+          },
+          "principal": {
+            "type": "boolean",
+            "description": "Indica se é o endereço principal do usuário."
+          }
+        }
+      },
+      "EnderecoInput": {
+        "type": "object",
+        "required": ["cep", "rua", "numero", "bairro", "cidade", "estado"],
+        "properties": {
+          "cep": {
             "type": "string"
+          },
+          "rua": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
+          },
+          "complemento": {
+            "type": "string"
+          },
+          "bairro": {
+            "type": "string"
+          },
+          "cidade": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "identificador": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "boolean"
           }
         }
       },
