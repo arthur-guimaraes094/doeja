@@ -12,8 +12,8 @@ const FloatingVegetables2D = dynamic(
 export default function PersistentBackground() {
   const pathname = usePathname();
 
-  // Omit background animation on docs/developer pages
-  if (pathname?.startsWith("/docs")) {
+  // Render background animation exclusively on the home page
+  if (pathname !== "/") {
     return null;
   }
 

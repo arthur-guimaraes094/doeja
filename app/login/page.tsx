@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { gsap, useGSAP } from "@/lib/gsap";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -19,40 +18,21 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     nome: "",
     telefone: "",
-    // Address components
-    cep: "",
-    rua: "",
-    numero: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    estado: "",
     rememberMe: false,
   });
 
-  useGSAP(() => {
-    const tl = gsap.timeline();
-    tl.fromTo(
-      cardRef.current,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }
-    );
-  }, { scope: containerRef });
-
-  const handleExit = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    gsap.to(cardRef.current, {
-      opacity: 0,
-      y: 12,
-      duration: 0.2,
-      ease: "power2.in",
-      onComplete: () => {
-        router.push(href);
-      },
-    });
-  };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const remember = localStorage.getItem("doeja_remember_me") !== "false";
+      setFormData((prev) => ({
+        ...prev,
+        rememberMe: remember,
+      }));
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -62,42 +42,7 @@ export default function LoginPage() {
     }));
   };
 
-  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    const cleanCep = rawValue.replace(/\D/g, "");
-    
-    // Format mask: 00000-000
-    let formattedCep = cleanCep;
-    if (cleanCep.length > 5) {
-      formattedCep = `${cleanCep.slice(0, 5)}-${cleanCep.slice(5, 8)}`;
-    }
 
-    setFormData((prev) => ({ ...prev, cep: formattedCep }));
-
-    if (cleanCep.length === 8) {
-      try {
-        setErrorMsg("");
-        const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
-        const data = await res.json();
-        
-        if (data.erro) {
-          setErrorMsg("CEP não encontrado.");
-          return;
-        }
-
-        setFormData((prev) => ({
-          ...prev,
-          rua: data.logradouro || "",
-          bairro: data.bairro || "",
-          cidade: data.localidade || "",
-          estado: data.uf || "",
-        }));
-      } catch (err) {
-        console.error("Erro ao buscar CEP:", err);
-        setErrorMsg("Erro de conexão ao buscar o CEP.");
-      }
-    }
-  };
 
   const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
@@ -128,6 +73,19 @@ export default function LoginPage() {
     setSuccessMsg("");
     setLoading(true);
 
+    if (typeof window !== "undefined") {
+      localStorage.setItem("doeja_remember_me", formData.rememberMe ? "true" : "false");
+      if (!formData.rememberMe) {
+        // Encontra todas as chaves do supabase no localStorage e remove-as para evitar conflitos
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith("sb-") || key.includes("supabase"))) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    }
+
     try {
       if (isLoginTab) {
         // LOGIN Flow
@@ -138,12 +96,17 @@ export default function LoginPage() {
 
         if (error) throw error;
 
-        setSuccessMsg("Conexão estabelecida com sucesso! Redirecionando...");
         setTimeout(() => {
           router.push("/");
         }, 1200);
       } else {
         // CADASTRO (Register) Flow
+        if (formData.password !== formData.confirmPassword) {
+          setErrorMsg("As senhas não coincidem.");
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -151,13 +114,6 @@ export default function LoginPage() {
             data: {
               nome: formData.nome,
               telefone: formData.telefone,
-              cep: formData.cep,
-              rua: formData.rua,
-              numero: formData.numero,
-              complemento: formData.complemento,
-              bairro: formData.bairro,
-              cidade: formData.cidade,
-              estado: formData.estado,
             },
           },
         });
@@ -178,15 +134,9 @@ export default function LoginPage() {
           setFormData((prev) => ({
             ...prev,
             password: "",
+            confirmPassword: "",
             nome: "",
             telefone: "",
-            cep: "",
-            rua: "",
-            numero: "",
-            complemento: "",
-            bairro: "",
-            cidade: "",
-            estado: "",
           }));
         }
       }
@@ -206,7 +156,6 @@ export default function LoginPage() {
       {/* Main Login Card */}
       <div
         ref={cardRef}
-        style={{ opacity: 0 }}
         className="relative grid grid-cols-1 md:grid-cols-12 w-full max-w-4xl min-h-[580px] bg-white border border-surface-tint/10 rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl z-10"
       >
         {/* Left Panel - Brand Showcase (Hidden on Mobile) */}
@@ -214,7 +163,6 @@ export default function LoginPage() {
           {/* Logo */}
           <Link
             href="/"
-            onClick={(e) => handleExit(e, "/")}
             className="inline-block transition-transform hover:scale-105 duration-200"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -246,7 +194,7 @@ export default function LoginPage() {
           <div className="flex justify-between items-center w-full mb-6">
             {/* Mobile Logo */}
             <div className="md:hidden flex items-center">
-              <Link href="/" onClick={(e) => handleExit(e, "/")}>
+              <Link href="/">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/logo.svg" alt="Logo DoeJÁ" className="h-9 w-auto object-contain" />
               </Link>
@@ -255,7 +203,6 @@ export default function LoginPage() {
             {/* Back Button */}
             <Link
               href="/"
-              onClick={(e) => handleExit(e, "/")}
               className="absolute top-6 right-8 text-on-surface-variant/70 hover:text-primary transition-all duration-200 flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full hover:bg-primary-container/20"
             >
               <svg
@@ -383,6 +330,35 @@ export default function LoginPage() {
                 />
               </div>
 
+              {/* Confirm Password Input (Only for Cadastro) */}
+              {!isLoginTab && (
+                <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="w-5 h-5 text-on-surface-variant/40 shrink-0"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                    />
+                  </svg>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirmar Senha"
+                    required={!isLoginTab}
+                    className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
+                  />
+                </div>
+              )}
+
               {/* Telefone (Only for Cadastro) */}
               {!isLoginTab && (
                 <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
@@ -412,118 +388,7 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* Endereço (Only for Cadastro) */}
-              {!isLoginTab && (
-                <div className="space-y-3 pt-2">
-                  <div className="text-xs font-bold text-secondary uppercase tracking-wider px-2">Endereço</div>
-                  
-                  {/* CEP */}
-                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="w-5 h-5 text-on-surface-variant/40 shrink-0"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1115 0z"
-                      />
-                    </svg>
-                    <input
-                      type="text"
-                      name="cep"
-                      maxLength={9}
-                      value={formData.cep}
-                      onChange={handleCepChange}
-                      placeholder="CEP (ex: 01001-000)"
-                      required={!isLoginTab}
-                      className="w-full ml-3 bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
-                    />
-                  </div>
 
-                  {/* Rua */}
-                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                    <input
-                      type="text"
-                      name="rua"
-                      value={formData.rua}
-                      onChange={handleChange}
-                      placeholder="Rua / Logradouro"
-                      required={!isLoginTab}
-                      className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
-                    />
-                  </div>
-
-                  {/* Número e Complemento */}
-                  <div className="grid grid-cols-12 gap-3">
-                    <div className="col-span-4 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                      <input
-                        type="text"
-                        name="numero"
-                        value={formData.numero}
-                        onChange={handleChange}
-                        placeholder="Nº"
-                        required={!isLoginTab}
-                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm text-center"
-                      />
-                    </div>
-                    <div className="col-span-8 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                      <input
-                        type="text"
-                        name="complemento"
-                        value={formData.complemento}
-                        onChange={handleChange}
-                        placeholder="Apto, Bloco..."
-                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Bairro */}
-                  <div className="relative flex items-center bg-white border border-outline-variant rounded-full px-5 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                    <input
-                      type="text"
-                      name="bairro"
-                      value={formData.bairro}
-                      onChange={handleChange}
-                      placeholder="Bairro"
-                      required={!isLoginTab}
-                      className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm md:text-base"
-                    />
-                  </div>
-
-                  {/* Cidade e Estado */}
-                  <div className="grid grid-cols-12 gap-3">
-                    <div className="col-span-8 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                      <input
-                        type="text"
-                        name="cidade"
-                        value={formData.cidade}
-                        onChange={handleChange}
-                        placeholder="Cidade"
-                        required={!isLoginTab}
-                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm"
-                      />
-                    </div>
-                    <div className="col-span-4 relative flex items-center bg-white border border-outline-variant rounded-full px-4 py-3.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all shadow-sm">
-                      <input
-                        type="text"
-                        name="estado"
-                        value={formData.estado}
-                        onChange={handleChange}
-                        placeholder="UF"
-                        required={!isLoginTab}
-                        className="w-full bg-transparent outline-none text-on-surface font-body-md placeholder:text-on-surface-variant/40 text-sm text-center"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Checkbox and Forgot Password (Only for Login) */}
               {isLoginTab && (

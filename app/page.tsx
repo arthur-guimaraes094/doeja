@@ -4,13 +4,10 @@ import React, { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import ScrollReveal from "../components/ScrollReveal";
 import Parallax from "../components/Parallax";
 import { HeartHandshakeIcon } from "../components/Icons";
 import { gsap, useGSAP } from "@/lib/gsap";
-import Magnetic from "../components/Magnetic";
 import KineticText from "../components/KineticText";
-import ImageReveal from "../components/ImageReveal";
 
 // FloatingVegetables2D is rendered persistently in layout.tsx
 
@@ -100,20 +97,16 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-sm md:gap-md justify-center pt-xs md:pt-md">
-              <Magnetic>
-                <div className="hero-button" style={{ opacity: 0 }}>
-                  <button className="bg-secondary text-white px-10 py-4 rounded-full font-display font-medium text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
-                    Quero Doar Agora
-                  </button>
-                </div>
-              </Magnetic>
-              <Magnetic>
-                <div className="hero-button" style={{ opacity: 0 }}>
-                  <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-display font-medium text-lg bg-white hover:bg-surface-container active:scale-95 transition-all cursor-pointer">
-                    Ver Projetos
-                  </button>
-                </div>
-              </Magnetic>
+              <div className="hero-button" style={{ opacity: 0 }}>
+                <button className="bg-secondary text-white px-10 py-4 rounded-full font-display font-medium text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                  Quero Doar Agora
+                </button>
+              </div>
+              <div className="hero-button" style={{ opacity: 0 }}>
+                <button className="border-2 border-primary text-primary px-10 py-4 rounded-full font-display font-medium text-lg bg-white hover:bg-surface-container hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                  Ver Projetos
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -121,7 +114,7 @@ export default function Home() {
         {/* Bento Grid Section (Value Props) */}
         <section className="relative z-10 w-full max-w-7xl px-margin-mobile md:px-margin-desktop py-xl mt-lg grid grid-cols-1 md:grid-cols-3 gap-md">
           {/* Card 1 (colspan-2) - Soft Green */}
-          <ScrollReveal className="md:col-span-2 group tactile-card bg-[#edf2e2]/95 border border-primary/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
+          <div className="md:col-span-2 tactile-card bg-[#edf2e2] border border-primary/15 p-lg rounded-[32px] flex flex-col md:flex-row items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-display text-2xl md:text-3xl font-bold text-primary">
                 Transparência Total
@@ -131,20 +124,20 @@ export default function Home() {
                 fotos do impacto real nas comunidades atendidas.
               </p>
             </div>
-            <ImageReveal
+            <img
               src="/transparencia.webp"
               alt="Ilustração de Transparência Total"
-              className="h-28 w-auto shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6"
+              className="h-28 w-auto shrink-0 object-contain"
             />
-          </ScrollReveal>
+          </div>
 
           {/* Card 2 - Soft Orange */}
-          <ScrollReveal className="group tactile-card bg-surface-container-low/95 border border-secondary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
+          <div className="tactile-card bg-surface-container-low border border-secondary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <ImageReveal
+              <img
                 src="/coracao-verificado.webp"
                 alt="Selo de ONG Verificada"
-                className="h-16 w-auto transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                className="h-16 w-auto object-contain"
               />
               <h3 className="font-display text-xl md:text-2xl font-bold text-secondary">
                 ONGs Verificadas
@@ -154,15 +147,15 @@ export default function Home() {
                 comprovado de impacto social.
               </p>
             </div>
-          </ScrollReveal>
+          </div>
 
           {/* Card 3 - Soft Green */}
-          <ScrollReveal className="group tactile-card bg-[#edf2e2]/95 border border-primary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
+          <div className="tactile-card bg-[#edf2e2] border border-primary/15 p-lg rounded-[32px] flex flex-col justify-between text-left gap-md shadow-lg min-h-[280px]">
             <div className="space-y-md">
-              <ImageReveal
+              <img
                 src="/comunidade.webp"
                 alt="Ilustração de Comunidade Viva"
-                className="h-16 w-auto transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+                className="h-16 w-auto object-contain"
               />
               <h3 className="font-display text-xl md:text-2xl font-bold text-primary">
                 Comunidade Viva
@@ -172,10 +165,10 @@ export default function Home() {
                 transformando o Brasil diariamente.
               </p>
             </div>
-          </ScrollReveal>
+          </div>
 
           {/* Card 4 (colspan-2) - Soft Orange */}
-          <ScrollReveal className="md:col-span-2 group tactile-card bg-surface-container-low/95 border border-secondary/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
+          <div className="md:col-span-2 tactile-card bg-surface-container-low border border-secondary/15 p-lg rounded-[32px] flex flex-col md:flex-row-reverse items-center gap-lg shadow-lg">
             <div className="flex-1 space-y-md text-left">
               <h3 className="font-display text-2xl md:text-3xl font-bold text-secondary">
                 Seja um Parceiro
@@ -184,31 +177,27 @@ export default function Home() {
                 Sua empresa pode fazer a diferença. Conheça nossos planos
                 corporativos de responsabilidade social.
               </p>
-              <Magnetic>
-                <div className="inline-block">
-                  <button className="bg-secondary text-white px-8 py-3 rounded-full font-label-md hover:bg-secondary/90 hover:scale-105 active:scale-95 transition-all shadow-md hover:shadow-lg cursor-pointer">
-                    Saber Mais
-                  </button>
-                </div>
-              </Magnetic>
+              <div className="inline-block">
+                <button className="bg-secondary text-white px-8 py-3 rounded-full font-label-md hover:bg-secondary/90 hover:scale-105 active:scale-95 transition-all shadow-md hover:shadow-lg cursor-pointer">
+                  Saber Mais
+                </button>
+              </div>
             </div>
-            <ImageReveal
+            <img
               src="/parceria.webp"
               alt="Ilustração de Parceria"
-              className="h-28 w-auto shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
+              className="h-28 w-auto shrink-0 object-contain"
             />
-          </ScrollReveal>
+          </div>
         </section>
 
         {/* Floating Action Button (FAB) */}
-        <Magnetic range={60} speed={1.4}>
-          <div className="fixed bottom-margin-mobile right-margin-mobile md:bottom-md md:right-md z-50">
-            <button className="bg-secondary text-white px-5 py-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-sm cursor-pointer hover:shadow-secondary/20">
-              <HeartHandshakeIcon size={24} aria-hidden="true" />
-              <span className="font-label-md hidden md:block">Doar Agora</span>
-            </button>
-          </div>
-        </Magnetic>
+        <div className="fixed bottom-margin-mobile right-margin-mobile md:bottom-md md:right-md z-50">
+          <button className="bg-secondary text-white px-5 py-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-sm cursor-pointer hover:shadow-secondary/20">
+            <HeartHandshakeIcon size={24} aria-hidden="true" />
+            <span className="font-label-md hidden md:block">Doar Agora</span>
+          </button>
+        </div>
 
         {/* Footer */}
         <Footer />

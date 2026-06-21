@@ -73,7 +73,7 @@ export default function FloatingVegetables2D() {
         const y = -h + Math.random() * (height + h);
 
         // Initial velocity - purely vertical falling (with initial vx = 0)
-        const baseSpeedY = 0.4 + Math.random() * 0.6;
+        const baseSpeedY = 0.8 + Math.random() * 2.0;
         const vx = 0;
         const vy = baseSpeedY;
 
