@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -47,11 +48,11 @@ export default function LoginPage() {
   const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
     const cleanValue = rawValue.replace(/\D/g, "");
-    
+
     let formattedValue = "";
     if (cleanValue.length > 0) {
       formattedValue = `(${cleanValue.slice(0, 2)}`;
-      
+
       if (cleanValue.length > 2) {
         formattedValue += `) ${cleanValue.slice(2, 6)}`;
       }
@@ -63,7 +64,7 @@ export default function LoginPage() {
         }
       }
     }
-    
+
     setFormData((prev) => ({ ...prev, telefone: formattedValue }));
   };
 
@@ -170,12 +171,15 @@ export default function LoginPage() {
           </Link>
 
           {/* Donation Box Illustration */}
-          <div className="flex-1 flex items-center justify-center py-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="flex-1 flex items-center justify-center py-6 relative">
+            <Image
               src="/caixa-doacao.webp"
               alt="Caixa de doação de alimentos DoeJÁ"
+              width={260}
+              height={260}
+              priority
               className="w-[90%] h-auto max-h-[260px] object-contain drop-shadow-[0_10px_15px_rgba(63,84,19,0.15)]"
+              style={{ height: "auto" }}
             />
           </div>
 
@@ -189,7 +193,7 @@ export default function LoginPage() {
 
         {/* Right Panel - Form */}
         <div className="col-span-1 md:col-span-7 bg-[#fff8f6] flex flex-col justify-between p-8 md:p-12 relative min-h-[480px] md:min-h-0">
-          
+
           {/* Top Row: Mobile Logo / Back Link */}
           <div className="flex justify-between items-center w-full mb-6">
             {/* Mobile Logo */}
@@ -403,11 +407,10 @@ export default function LoginPage() {
                         className="sr-only"
                       />
                       <div
-                        className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
-                          formData.rememberMe
+                        className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${formData.rememberMe
                             ? "bg-primary border-primary shadow-sm"
                             : "border-outline-variant bg-white group-hover:border-primary"
-                        }`}
+                          }`}
                       >
                         {formData.rememberMe && (
                           <svg

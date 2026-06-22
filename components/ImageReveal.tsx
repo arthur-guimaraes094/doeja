@@ -1,6 +1,5 @@
-"use client";
-
 import React, { useRef } from "react";
+import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 
 interface ImageRevealProps {
@@ -56,14 +55,15 @@ export default function ImageReveal({
   return (
     <div
       ref={containerRef}
-      className={`overflow-hidden ${className}`}
+      className={`overflow-hidden relative ${className}`}
       style={{ clipPath: "inset(100% 0% 0% 0%)" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={src}
         alt={alt}
-        className={`reveal-img w-full h-full object-contain ${imgClassName}`}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className={`reveal-img object-contain ${imgClassName}`}
       />
     </div>
   );

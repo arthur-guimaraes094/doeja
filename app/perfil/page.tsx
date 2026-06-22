@@ -52,20 +52,6 @@ export default function PerfilPage() {
   // Address Modal State
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Endereco | null>(null);
-  const [addressFormData, setAddressFormData] = useState({
-    cep: "",
-    rua: "",
-    numero: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    estado: "",
-    identificador: "Casa",
-    principal: false,
-  });
-
-  // CEP API Loading
-  const [loadingCep, setLoadingCep] = useState(false);
 
   // Fetch all user data
   useEffect(() => {
@@ -163,39 +149,7 @@ export default function PerfilPage() {
     setProfile(prev => ({ ...prev, telefone: formattedValue }));
   };
 
-  // Masked CEP change with ViaCEP API fetch
-  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    const cleanValue = rawValue.replace(/\D/g, "").slice(0, 8);
-    
-    let formatted = cleanValue;
-    if (cleanValue.length > 5) {
-      formatted = `${cleanValue.slice(0, 5)}-${cleanValue.slice(5)}`;
-    }
-    
-    setAddressFormData(prev => ({ ...prev, cep: formatted }));
 
-    if (cleanValue.length === 8) {
-      try {
-        setLoadingCep(true);
-        const res = await fetch(`https://viacep.com.br/ws/${cleanValue}/json/`);
-        const data = await res.json();
-        if (!data.erro) {
-          setAddressFormData(prev => ({
-            ...prev,
-            rua: data.logradouro || "",
-            bairro: data.bairro || "",
-            cidade: data.localidade || "",
-            estado: data.uf || "",
-          }));
-        }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-      } finally {
-        setLoadingCep(false);
-      }
-    }
-  };
 
   // Save profile info
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -285,109 +239,12 @@ export default function PerfilPage() {
   // Modal open helpers
   const openAddAddressModal = () => {
     setEditingAddress(null);
-    setAddressFormData({
-      cep: "",
-      rua: "",
-      numero: "",
-      complemento: "",
-      bairro: "",
-      cidade: "",
-      estado: "",
-      identificador: "Casa",
-      principal: false,
-    });
     setIsAddressModalOpen(true);
   };
 
   const openEditAddressModal = (addr: Endereco) => {
     setEditingAddress(addr);
-    setAddressFormData({
-      cep: addr.cep,
-      rua: addr.rua,
-      numero: addr.numero,
-      complemento: addr.complemento || "",
-      bairro: addr.bairro,
-      cidade: addr.cidade,
-      estado: addr.estado,
-      identificador: addr.identificador || "Casa",
-      principal: addr.principal,
-    });
     setIsAddressModalOpen(true);
-  };
-
-  // Save address details (Insert or Update)
-  const handleSaveAddress = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingAddress(true);
-
-    if (!addressFormData.cep || !addressFormData.rua || !addressFormData.numero || !addressFormData.bairro || !addressFormData.cidade || !addressFormData.estado) {
-      alert("Preencha todos os campos obrigatórios.");
-      setSavingAddress(false);
-      return;
-    }
-
-    try {
-      const isFirstAddress = addresses.length === 0;
-      const willBePrincipal = isFirstAddress ? true : addressFormData.principal;
-
-      // If this address is set as principal, reset others first
-      if (willBePrincipal) {
-        const { error: resetError } = await supabase
-          .from("endereco")
-          .update({ principal: false })
-          .eq("id_usuario", user.id);
-        if (resetError) throw resetError;
-      }
-
-      if (editingAddress) {
-        // Edit flow
-        const { error } = await supabase
-          .from("endereco")
-          .update({
-            cep: addressFormData.cep,
-            rua: addressFormData.rua,
-            numero: addressFormData.numero,
-            complemento: addressFormData.complemento,
-            bairro: addressFormData.bairro,
-            cidade: addressFormData.cidade,
-            estado: addressFormData.estado,
-            identificador: addressFormData.identificador,
-            principal: willBePrincipal,
-          })
-          .eq("id_endereco", editingAddress.id_endereco);
-
-        if (error) throw error;
-      } else {
-        // Add flow
-        const { error } = await supabase
-          .from("endereco")
-          .insert({
-            id_usuario: user.id,
-            cep: addressFormData.cep,
-            rua: addressFormData.rua,
-            numero: addressFormData.numero,
-            complemento: addressFormData.complemento,
-            bairro: addressFormData.bairro,
-            cidade: addressFormData.cidade,
-            estado: addressFormData.estado,
-            identificador: addressFormData.identificador,
-            principal: willBePrincipal,
-          });
-
-        if (error) throw error;
-      }
-
-      // Close modal and refresh list
-      setIsAddressModalOpen(false);
-      setEditingAddress(null);
-      await fetchAddresses(user.id);
-
-    } catch (err: any) {
-      console.error(err);
-      alert("Erro ao salvar endereço.");
-    } finally {
-      setSavingAddress(false);
-    }
   };
 
   // Get user initials for avatar
@@ -448,9 +305,10 @@ export default function PerfilPage() {
 
   return (
     <>
-      <Header />
+      <div className={`transition-transform duration-300 ${isAddressModalOpen ? "pointer-events-none select-none scale-[0.99]" : ""}`}>
+        <Header />
 
-      <main className="w-full min-h-screen bg-background text-on-surface py-12 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto flex flex-col gap-10">
+        <main className="w-full min-h-screen bg-background text-on-surface py-12 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto flex flex-col gap-10">
         
         {/* Page Title */}
         <div className="space-y-2">
@@ -696,252 +554,438 @@ export default function PerfilPage() {
       </main>
 
       {/* Address Slide-in / Modal */}
-      {isAddressModalOpen && mounted && createPortal(
-        <div 
-          className="fixed z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/40"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-          }}
-        >
-          
-          {/* Modal Card */}
-          <div 
-            className="relative bg-white border border-surface-variant/10 rounded-[32px] overflow-y-auto shadow-2xl p-6 md:p-8 text-left flex flex-col gap-6"
-            style={{
-              width: "100%",
-              maxWidth: "576px",
-              maxHeight: "90vh",
-            }}
-          >
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-surface-variant/10 pb-4">
-              <h3 className="font-display text-2xl font-bold text-primary">
-                {editingAddress ? "Editar Endereço" : "Novo Endereço"}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsAddressModalOpen(false)}
-                className="w-9 h-9 rounded-full hover:bg-surface-variant/20 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-all cursor-pointer"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        editingAddress={editingAddress}
+        userId={user?.id}
+        addressesCount={addresses.length}
+        onAddressSaved={async () => {
+          if (user) {
+            await fetchAddresses(user.id);
+          }
+        }}
+      />
 
-            {/* Modal Form */}
-            <form onSubmit={handleSaveAddress} className="space-y-4">
-              
-              {/* Presets Identificador */}
-              <div className="space-y-2">
-                <label className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                  Identificador do Endereço
-                </label>
-                <div className="flex gap-2">
-                  {["Casa", "Trabalho", "Outro"].map((type) => {
-                    const isSelected = addressFormData.identificador === type || 
-                      (type === "Outro" && addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho");
-                    return (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => setAddressFormData(prev => ({ ...prev, identificador: type }))}
-                        className={`px-4 py-2.5 rounded-full font-bold text-xs transition-all border cursor-pointer ${
-                          isSelected
-                            ? "bg-primary text-white border-primary"
-                            : "bg-[#fff8f6] text-on-surface-variant/80 border-outline-variant hover:border-on-surface-variant/40"
-                        }`}
-                      >
-                        {type === "Casa" && "🏠 Casa"}
-                        {type === "Trabalho" && "💼 Trabalho"}
-                        {type === "Outro" && "📍 Outro"}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                {/* Custom Label Input if Outro is selected */}
-                {addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho" && (
-                  <input
-                    type="text"
-                    value={addressFormData.identificador === "Outro" ? "" : addressFormData.identificador}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, identificador: e.target.value || "Outro" }))}
-                    placeholder="Ex: Casa de Campo, Mãe, etc."
-                    className="w-full mt-2 px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                  />
+        <Footer />
+      </div>
+    </>
+  );
+}
+
+interface AddressModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  editingAddress: Endereco | null;
+  userId: string;
+  addressesCount: number;
+  onAddressSaved: () => Promise<void>;
+}
+
+function AddressModal({
+  isOpen,
+  onClose,
+  editingAddress,
+  userId,
+  addressesCount,
+  onAddressSaved,
+}: AddressModalProps) {
+  const [mounted, setMounted] = useState(false);
+  const [addressFormData, setAddressFormData] = useState({
+    cep: "",
+    rua: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    identificador: "Casa",
+    principal: false,
+  });
+  const [loadingCep, setLoadingCep] = useState(false);
+  const [savingAddress, setSavingAddress] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (editingAddress) {
+        setAddressFormData({
+          cep: editingAddress.cep,
+          rua: editingAddress.rua,
+          numero: editingAddress.numero,
+          complemento: editingAddress.complemento || "",
+          bairro: editingAddress.bairro,
+          cidade: editingAddress.cidade,
+          estado: editingAddress.estado,
+          identificador: editingAddress.identificador || "Casa",
+          principal: editingAddress.principal,
+        });
+      } else {
+        setAddressFormData({
+          cep: "",
+          rua: "",
+          numero: "",
+          complemento: "",
+          bairro: "",
+          cidade: "",
+          estado: "",
+          identificador: "Casa",
+          principal: false,
+        });
+      }
+    }
+  }, [editingAddress, isOpen]);
+
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const cleanValue = rawValue.replace(/\D/g, "").slice(0, 8);
+    
+    let formatted = cleanValue;
+    if (cleanValue.length > 5) {
+      formatted = `${cleanValue.slice(0, 5)}-${cleanValue.slice(5)}`;
+    }
+    
+    setAddressFormData(prev => ({ ...prev, cep: formatted }));
+
+    if (cleanValue.length === 8) {
+      try {
+        setLoadingCep(true);
+        const res = await fetch(`https://viacep.com.br/ws/${cleanValue}/json/`);
+        const data = await res.json();
+        if (!data.erro) {
+          setAddressFormData(prev => ({
+            ...prev,
+            rua: data.logradouro || "",
+            bairro: data.bairro || "",
+            cidade: data.localidade || "",
+            estado: data.uf || "",
+          }));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      } finally {
+        setLoadingCep(false);
+      }
+    }
+  };
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingAddress(true);
+
+    if (!addressFormData.cep || !addressFormData.rua || !addressFormData.numero || !addressFormData.bairro || !addressFormData.cidade || !addressFormData.estado) {
+      alert("Preencha todos os campos obrigatórios.");
+      setSavingAddress(false);
+      return;
+    }
+
+    try {
+      const isFirstAddress = addressesCount === 0;
+      const willBePrincipal = isFirstAddress ? true : addressFormData.principal;
+
+      if (willBePrincipal) {
+        const { error: resetError } = await supabase
+          .from("endereco")
+          .update({ principal: false })
+          .eq("id_usuario", userId);
+        if (resetError) throw resetError;
+      }
+
+      if (editingAddress) {
+        const { error } = await supabase
+          .from("endereco")
+          .update({
+            cep: addressFormData.cep,
+            rua: addressFormData.rua,
+            numero: addressFormData.numero,
+            complemento: addressFormData.complemento,
+            bairro: addressFormData.bairro,
+            cidade: addressFormData.cidade,
+            estado: addressFormData.estado,
+            identificador: addressFormData.identificador,
+            principal: willBePrincipal,
+          })
+          .eq("id_endereco", editingAddress.id_endereco);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("endereco")
+          .insert({
+            id_usuario: userId,
+            cep: addressFormData.cep,
+            rua: addressFormData.rua,
+            numero: addressFormData.numero,
+            complemento: addressFormData.complemento,
+            bairro: addressFormData.bairro,
+            cidade: addressFormData.cidade,
+            estado: addressFormData.estado,
+            identificador: addressFormData.identificador,
+            principal: willBePrincipal,
+          });
+
+        if (error) throw error;
+      }
+
+      onClose();
+      await onAddressSaved();
+
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao salvar endereço.");
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
+    <div 
+      className="fixed z-50 flex items-center justify-center p-4 bg-black/45 cursor-pointer"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
+      {/* Modal Card */}
+      <div 
+        className="relative bg-white border border-surface-variant/10 rounded-[32px] overflow-y-auto shadow-2xl p-6 md:p-8 text-left flex flex-col gap-6 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%",
+          maxWidth: "576px",
+          maxHeight: "90vh",
+        }}
+      >
+        
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-surface-variant/10 pb-4">
+          <h3 className="font-display text-2xl font-bold text-primary">
+            {editingAddress ? "Editar Endereço" : "Novo Endereço"}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-9 h-9 rounded-full hover:bg-surface-variant/20 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-all cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Modal Form */}
+        <form onSubmit={handleSaveAddress} className="space-y-4">
+          
+          {/* Presets Identificador */}
+          <div className="space-y-2">
+            <label className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+              Identificador do Endereço
+            </label>
+            <div className="flex gap-2">
+              {["Casa", "Trabalho", "Outro"].map((type) => {
+                const isSelected = addressFormData.identificador === type || 
+                  (type === "Outro" && addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho");
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAddressFormData(prev => ({ ...prev, identificador: type }))}
+                    className={`px-4 py-2.5 rounded-full font-bold text-xs transition-all border cursor-pointer ${
+                      isSelected
+                        ? "bg-primary text-white border-primary"
+                        : "bg-[#fff8f6] text-on-surface-variant/80 border-outline-variant hover:border-on-surface-variant/40"
+                    }`}
+                  >
+                    {type === "Casa" && "🏠 Casa"}
+                    {type === "Trabalho" && "💼 Trabalho"}
+                    {type === "Outro" && "📍 Outro"}
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Custom Label Input if Outro is selected */}
+            {addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho" && (
+              <input
+                type="text"
+                value={addressFormData.identificador === "Outro" ? "" : addressFormData.identificador}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, identificador: e.target.value || "Outro" }))}
+                placeholder="Ex: Casa de Campo, Mãe, etc."
+                className="w-full mt-2 px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+              />
+            )}
+          </div>
+
+          {/* Grid 1: CEP */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="cep" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                CEP *
+              </label>
+              <div className="relative">
+                <input
+                  id="cep"
+                  type="text"
+                  value={addressFormData.cep}
+                  onChange={handleCepChange}
+                  placeholder="59000-000"
+                  className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                  required
+                />
+                {loadingCep && (
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
                 )}
               </div>
+            </div>
 
-              {/* Grid 1: CEP */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="cep" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    CEP *
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="cep"
-                      type="text"
-                      value={addressFormData.cep}
-                      onChange={handleCepChange}
-                      placeholder="59000-000"
-                      className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                      required
-                    />
-                    {loadingCep && (
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="estado" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    Estado (UF) *
-                  </label>
-                  <input
-                    id="estado"
-                    type="text"
-                    value={addressFormData.estado}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, estado: e.target.value.toUpperCase().slice(0, 2) }))}
-                    placeholder="RN"
-                    className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Grid 2: Cidade & Bairro */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="cidade" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    Cidade *
-                  </label>
-                  <input
-                    id="cidade"
-                    type="text"
-                    value={addressFormData.cidade}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, cidade: e.target.value }))}
-                    placeholder="Natal"
-                    className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="bairro" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    Bairro *
-                  </label>
-                  <input
-                    id="bairro"
-                    type="text"
-                    value={addressFormData.bairro}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, bairro: e.target.value }))}
-                    placeholder="Lagoa Nova"
-                    className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Grid 3: Rua & Numero */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2 space-y-1.5">
-                  <label htmlFor="rua" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    Rua / Avenida *
-                  </label>
-                  <input
-                    id="rua"
-                    type="text"
-                    value={addressFormData.rua}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, rua: e.target.value }))}
-                    placeholder="Av. Senador Salgado Filho"
-                    className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="numero" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                    Número *
-                  </label>
-                  <input
-                    id="numero"
-                    type="text"
-                    value={addressFormData.numero}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, numero: e.target.value }))}
-                    placeholder="123"
-                    className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Complemento */}
-              <div className="space-y-1.5">
-                <label htmlFor="complemento" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
-                  Complemento
-                </label>
-                <input
-                  id="complemento"
-                  type="text"
-                  value={addressFormData.complemento}
-                  onChange={(e) => setAddressFormData(prev => ({ ...prev, complemento: e.target.value }))}
-                  placeholder="Apto 402, Bloco B"
-                  className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
-                />
-              </div>
-
-              {/* Set Principal Checkbox */}
-              {addresses.length > 0 && (
-                <div className="flex items-center gap-2.5 py-1.5">
-                  <input
-                    id="principal"
-                    type="checkbox"
-                    checked={addressFormData.principal}
-                    onChange={(e) => setAddressFormData(prev => ({ ...prev, principal: e.target.checked }))}
-                    className="w-5 h-5 accent-primary border-outline-variant rounded-md cursor-pointer"
-                  />
-                  <label htmlFor="principal" className="font-body-md text-sm text-on-surface font-medium cursor-pointer select-none">
-                    Definir como endereço principal
-                  </label>
-                </div>
-              )}
-
-              {/* Submit Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-surface-variant/10">
-                <button
-                  type="button"
-                  onClick={() => setIsAddressModalOpen(false)}
-                  className="w-1/2 py-3.5 rounded-2xl border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-variant/10 transition-all cursor-pointer text-center text-sm"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingAddress}
-                  className="w-1/2 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-primary text-white font-bold hover:bg-primary/95 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 text-sm shadow-xs"
-                >
-                  {savingAddress ? (
-                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  ) : (
-                    "Salvar Endereço"
-                  )}
-                </button>
-              </div>
-
-            </form>
-
+            <div className="space-y-1.5">
+              <label htmlFor="estado" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                Estado (UF) *
+              </label>
+              <input
+                id="estado"
+                type="text"
+                value={addressFormData.estado}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, estado: e.target.value.toUpperCase().slice(0, 2) }))}
+                placeholder="RN"
+                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                required
+              />
+            </div>
           </div>
-        </div>,
-        document.body
-      )}
 
-      <Footer />
-    </>
+          {/* Grid 2: Cidade & Bairro */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="cidade" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                Cidade *
+              </label>
+              <input
+                id="cidade"
+                type="text"
+                value={addressFormData.cidade}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, cidade: e.target.value }))}
+                placeholder="Natal"
+                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="bairro" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                Bairro *
+              </label>
+              <input
+                id="bairro"
+                type="text"
+                value={addressFormData.bairro}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, bairro: e.target.value }))}
+                placeholder="Lagoa Nova"
+                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Grid 3: Rua & Numero */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2 space-y-1.5">
+              <label htmlFor="rua" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                Rua / Avenida *
+              </label>
+              <input
+                id="rua"
+                type="text"
+                value={addressFormData.rua}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, rua: e.target.value }))}
+                placeholder="Av. Senador Salgado Filho"
+                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="numero" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+                Número *
+              </label>
+              <input
+                id="numero"
+                type="text"
+                value={addressFormData.numero}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, numero: e.target.value }))}
+                placeholder="123"
+                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Complemento */}
+          <div className="space-y-1.5">
+            <label htmlFor="complemento" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+              Complemento
+            </label>
+            <input
+              id="complemento"
+              type="text"
+              value={addressFormData.complemento}
+              onChange={(e) => setAddressFormData(prev => ({ ...prev, complemento: e.target.value }))}
+              placeholder="Apto 402, Bloco B"
+              className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+            />
+          </div>
+
+          {/* Set Principal Checkbox */}
+          {addressesCount > 0 && (
+            <div className="flex items-center gap-2.5 py-1.5">
+              <input
+                id="principal"
+                type="checkbox"
+                checked={addressFormData.principal}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, principal: e.target.checked }))}
+                className="w-5 h-5 accent-primary border-outline-variant rounded-md cursor-pointer"
+              />
+              <label htmlFor="principal" className="font-body-md text-sm text-on-surface font-medium cursor-pointer select-none">
+                Definir como endereço principal
+              </label>
+            </div>
+          )}
+
+          {/* Submit Buttons */}
+          <div className="flex gap-3 pt-4 border-t border-surface-variant/10">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-1/2 py-3.5 rounded-2xl border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-variant/10 transition-all cursor-pointer text-center text-sm"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={savingAddress}
+              className="w-1/2 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-primary text-white font-bold hover:bg-primary/95 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 text-sm shadow-xs"
+            >
+              {savingAddress ? (
+                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              ) : (
+                "Salvar Endereço"
+              )}
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>,
+    document.body
   );
 }
