@@ -1,0 +1,110 @@
+{
+  "color": {
+    "primary": {
+      "$type": "color",
+      "$value": "#3f5413",
+      "$description": "Verde principal orgânico, representa crescimento e sustentabilidade."
+    },
+    "primary-container": {
+      "$type": "color",
+      "$value": "#a8c66c",
+      "$description": "Verde claro usado para painéis secundários ou containers amigáveis."
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "#814900",
+      "$description": "Laranja escuro/médio, usado para botões de ação principais (ex: doar)."
+    },
+    "secondary-container": {
+      "$type": "color",
+      "$value": "#fd9923",
+      "$description": "Laranja claro vibrante para chamadas interativas de destaque."
+    },
+    "tertiary": {
+      "$type": "color",
+      "$value": "#2c6a4a",
+      "$description": "Verde floresta escuro para textos de alto contraste e ícones acessíveis."
+    },
+    "background": {
+      "$type": "color",
+      "$value": "#fff8f6",
+      "$description": "Creme suave acolhedor para fundos de página, reduz cansaço visual."
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "#fff8f6"
+    },
+    "on-surface": {
+      "$type": "color",
+      "$value": "#211a17"
+    },
+    "surface-variant": {
+      "$type": "color",
+      "$value": "#ede0da"
+    },
+    "on-surface-variant": {
+      "$type": "color",
+      "$value": "#45483b"
+    }
+  },
+  "spacing": {
+    "xs": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "base": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "80px"
+    },
+    "margin-mobile": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "margin-desktop": {
+      "$type": "dimension",
+      "$value": "64px"
+    }
+  },
+  "rounded": {
+    "sm": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "default": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "full": {
+      "$type": "dimension",
+      "$value": "9999px"
+    }
+  }
+}

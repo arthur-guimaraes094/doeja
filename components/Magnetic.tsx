@@ -16,9 +16,18 @@ export default function Magnetic({ children, range = 50, speed = 1.2 }: Magnetic
     const el = ref.current;
     if (!el) return;
 
+    let rect: DOMRect | null = null;
+
+    const handleMouseEnter = () => {
+      rect = el.getBoundingClientRect();
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
-      const { left, top, width, height } = el.getBoundingClientRect();
+      if (!rect) {
+        rect = el.getBoundingClientRect();
+      }
+      const { left, top, width, height } = rect;
       const x = clientX - (left + width / 2);
       const y = clientY - (top + height / 2);
       const distance = Math.sqrt(x * x + y * y);
@@ -43,6 +52,7 @@ export default function Magnetic({ children, range = 50, speed = 1.2 }: Magnetic
     };
 
     const handleMouseLeave = () => {
+      rect = null;
       gsap.to(el, {
         x: 0,
         y: 0,
@@ -51,10 +61,12 @@ export default function Magnetic({ children, range = 50, speed = 1.2 }: Magnetic
       });
     };
 
+    el.addEventListener("mouseenter", handleMouseEnter);
     el.addEventListener("mousemove", handleMouseMove);
     el.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
+      el.removeEventListener("mouseenter", handleMouseEnter);
       el.removeEventListener("mousemove", handleMouseMove);
       el.removeEventListener("mouseleave", handleMouseLeave);
     };

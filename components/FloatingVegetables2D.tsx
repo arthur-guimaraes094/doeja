@@ -19,6 +19,7 @@ export default function FloatingVegetables2D() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (window.innerWidth < 768) return;
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -72,7 +73,7 @@ export default function FloatingVegetables2D() {
         const y = -h + Math.random() * (height + h);
 
         // Initial velocity - purely vertical falling (with initial vx = 0)
-        const baseSpeedY = 0.4 + Math.random() * 0.6;
+        const baseSpeedY = 0.8 + Math.random() * 2.0;
         const vx = 0;
         const vy = baseSpeedY;
 
@@ -90,6 +91,9 @@ export default function FloatingVegetables2D() {
         });
       }
     };
+
+    // Cache bounding rect to avoid layout thrashing on mousemove
+    let rect = canvas.getBoundingClientRect();
 
     // Resize Observer to keep canvas buffer and layout sizes synchronized
     // Scale buffer by devicePixelRatio for sharp rendering on Retina/HiDPI screens
@@ -115,6 +119,9 @@ export default function FloatingVegetables2D() {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = isMobile ? "medium" : "high";
         
+        // Update cached rect when dimensions change
+        rect = canvas.getBoundingClientRect();
+
         // Only re-initialize items if it is the first load or if the width changed (e.g. orientation changes).
         // This prevents items from flashing/resetting when the browser address bar collapses/expands on scroll.
         if (isFirstInit || widthChanged) {
@@ -125,23 +132,7 @@ export default function FloatingVegetables2D() {
 
     resizeObserver.observe(canvas);
 
-    // Mouse Tracking Coordinates
-    let mouseX = -9999;
-    let mouseY = -9999;
-
-    const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = event.clientX - rect.left;
-      mouseY = event.clientY - rect.top;
-    };
-
-    const handleMouseLeave = () => {
-      mouseX = -9999;
-      mouseY = -9999;
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
+    // Mouse interaction removed for performance optimization
 
     // Scroll Physical Impulse
     let lastScrollY = window.scrollY;
@@ -199,43 +190,6 @@ export default function FloatingVegetables2D() {
 
         // Restore Y base upward drift speed slowly (adjusted for dt)
         item.vy += (item.baseSpeedY - item.vy) * 0.015 * dt;
-
-        // Magnetic field hover repulsion (soft interaction field)
-        const dx = item.x - mouseX;
-        const dy = item.y - mouseY;
-        const distSq = dx * dx + dy * dy;
-        const influenceRadius = 220; // 220px field of influence
-        const influenceRadiusSq = influenceRadius * influenceRadius;
-
-        if (distSq < influenceRadiusSq) {
-          const distance = Math.sqrt(distSq);
-          if (distance > 0.1) {
-            // Normalized direction vector from mouse to item
-            const dirX = dx / distance;
-            const dirY = dy / distance;
-
-            // Distance factor (1 at center, 0 at boundary, using quadratic falloff for smoothness)
-            const factor = (influenceRadius - distance) / influenceRadius;
-            const force = factor * factor; // Smooth quadratic easing
-
-            // Apply soft repulsion push force
-            const pushForce = force * 0.45 * dt;
-            item.vx += dirX * pushForce;
-            item.vy += dirY * pushForce;
-
-            // Add dynamic rotation based on mouse proximity
-            item.vrot += (Math.random() - 0.5) * force * 0.015 * dt;
-
-            // Direct contact extra kick (when mouse is very close)
-            const contactRadius = Math.max(item.width, item.height) * 0.6;
-            if (distance < contactRadius) {
-              const contactFactor = (contactRadius - distance) / contactRadius;
-              item.vx += dirX * contactFactor * 1.8 * dt;
-              item.vy += dirY * contactFactor * 1.8 * dt;
-              item.vrot += (Math.random() - 0.5) * contactFactor * 0.08 * dt;
-            }
-          }
-        }
 
         // Screen boundary wraps
         const marginW = item.width;
@@ -343,8 +297,6 @@ export default function FloatingVegetables2D() {
     // Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       resizeObserver.disconnect();
@@ -354,7 +306,7 @@ export default function FloatingVegetables2D() {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full pointer-events-none"
+      className="hidden md:block w-full h-full pointer-events-none"
       aria-hidden="true"
     />
   );

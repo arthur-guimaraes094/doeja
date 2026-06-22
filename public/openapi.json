@@ -1,0 +1,797 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Banco de Dados - DoeJÁ",
+    "description": "Documentação interativa das tabelas do banco de dados do **DoeJÁ** através do Supabase Data API (PostgREST).\n\n### Cabeçalhos Obrigatórios\nTodas as requisições requerem a passagem da chave pública nos seguintes cabeçalhos:\n* `apikey`: `sb_publishable_r-jgFHGVTkpLH90bukXpVQ_UUbwsGRe`\n* `Authorization`: `Bearer sb_publishable_r-jgFHGVTkpLH90bukXpVQ_UUbwsGRe`\n\n### Operadores de Filtro Comuns (PostgREST)\nAo fazer buscas no `GET`, você pode filtrar colunas usando a sintaxe `coluna=operador.valor`:\n* `eq` (igual): `/usuario?email=eq.user@email.com`\n* `neq` (diferente): `/usuario?id_usuario=neq.1`\n* `gt` (maior que): `/doacao?id_doacao=gt.10`\n* `lt` (menor que): `/doacao?id_doacao=lt.5`\n* `ilike` (pesquisa sem distinção de maiúsculas/minúsculas): `/ongs?nome=ilike.*fome*`\n* `is` (nulo ou booleano): `/doacao?id_ong=is.null`\n* `in` (contido na lista): `/doacao?status=in.(PENDENTE,APROVADA)`",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://fmfhfvopdtuunuowffti.supabase.co/rest/v1",
+      "description": "API REST de Produção (Supabase)"
+    }
+  ],
+  "security": [
+    {
+      "apikey": []
+    },
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/usuario": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Listar usuários",
+        "description": "Retorna uma lista de usuários cadastrados no banco de dados.",
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "description": "Colunas para retornar (ex: `id_usuario,nome,email`). Padrão: `*`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_usuario",
+            "in": "query",
+            "description": "Filtrar por ID do usuário (ex: `eq.123`)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Filtrar por e-mail (ex: `eq.exemplo@email.com`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários retornada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Usuario"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Usuários"],
+        "summary": "Criar usuário",
+        "description": "Cadastra um novo usuário no banco de dados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Usuario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso."
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar usuário",
+        "description": "Atualiza dados de um ou mais usuários correspondentes aos filtros informados.",
+        "parameters": [
+          {
+            "name": "id_usuario",
+            "in": "query",
+            "required": true,
+            "description": "Filtro para identificar o usuário a atualizar (ex: `eq.1`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Usuário atualizado com sucesso."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Usuários"],
+        "summary": "Deletar usuário",
+        "description": "Remove um usuário do sistema.",
+        "parameters": [
+          {
+            "name": "id_usuario",
+            "in": "query",
+            "required": true,
+            "description": "Filtro para identificar o usuário a deletar (ex: `eq.1`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Usuário removido com sucesso."
+          }
+        }
+      }
+    },
+    "/ongs": {
+      "get": {
+        "tags": ["ONGs"],
+        "summary": "Listar ONGs",
+        "description": "Retorna uma lista das ONGs parceiras cadastradas no sistema.",
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "description": "Colunas a retornar (ex: `id_ong,nome`). Padrão: `*`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "Filtrar por nome (ex: `ilike.*fome*`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de ONGs retornada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ong"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["ONGs"],
+        "summary": "Cadastrar ONG",
+        "description": "Cadastra uma nova ONG no sistema.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ong"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "ONG cadastrada com sucesso."
+          }
+        }
+      },
+      "patch": {
+        "tags": ["ONGs"],
+        "summary": "Atualizar dados da ONG",
+        "parameters": [
+          {
+            "name": "id_ong",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando a ONG (ex: `eq.1`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OngInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "ONG atualizada com sucesso."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["ONGs"],
+        "summary": "Deletar ONG",
+        "parameters": [
+          {
+            "name": "id_ong",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando a ONG a remover (ex: `eq.1`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "ONG deletada com sucesso."
+          }
+        }
+      }
+    },
+    "/doacao": {
+      "get": {
+        "tags": ["Doações"],
+        "summary": "Listar doações",
+        "description": "Retorna uma lista de doações registradas.",
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "description": "Colunas e subrecursos a buscar (ex: `*,item_doacao(*)`). Padrão: `*`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_usuario",
+            "in": "query",
+            "description": "Filtrar doações criadas por um usuário específico (ex: `eq.1`)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filtrar por status da doação (ex: `eq.PENDENTE`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de doações retornada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Doacao"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Doações"],
+        "summary": "Registrar doação",
+        "description": "Registra uma nova intenção de doação.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Doacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Doação criada com sucesso."
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Doações"],
+        "summary": "Atualizar doação",
+        "parameters": [
+          {
+            "name": "id_doacao",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando a doação (ex: `eq.5`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoacaoInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Doação atualizada com sucesso."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Doações"],
+        "summary": "Deletar doação",
+        "parameters": [
+          {
+            "name": "id_doacao",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando a doação a remover (ex: `eq.5`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Doação deletada com sucesso."
+          }
+        }
+      }
+    },
+    "/item_doacao": {
+      "get": {
+        "tags": ["Itens de Doação"],
+        "summary": "Listar itens de doações",
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id_doacao",
+            "in": "query",
+            "description": "Filtrar por ID da doação vinculada (ex: `eq.5`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemDoacao"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Itens de Doação"],
+        "summary": "Adicionar item à doação",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemDoacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item inserido com sucesso."
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Itens de Doação"],
+        "summary": "Atualizar item",
+        "parameters": [
+          {
+            "name": "id_item",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando o item (ex: `eq.10`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemDoacaoInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Item atualizado."
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Itens de Doação"],
+        "summary": "Remover item de doação",
+        "parameters": [
+          {
+            "name": "id_item",
+            "in": "query",
+            "required": true,
+            "description": "Filtro identificando o item a remover (ex: `eq.10`)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item removido."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "apikey"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Usuario": {
+        "type": "object",
+        "required": ["nome"],
+        "properties": {
+          "id_usuario": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Identificador único (UUID) integrado ao Supabase Auth."
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do doador/usuário."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Endereço de e-mail."
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Número de telefone."
+          },
+          "data_cadastro": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de cadastro do usuário."
+          },
+          "enderecos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Endereco"
+            },
+            "description": "Lista de endereços associados ao usuário."
+          }
+        }
+      },
+      "UsuarioInput": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "telefone": {
+            "type": "string"
+          }
+        }
+      },
+      "Endereco": {
+        "type": "object",
+        "required": ["cep", "rua", "numero", "bairro", "cidade", "estado"],
+        "properties": {
+          "id_endereco": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true,
+            "description": "Chave primária autoincrementável do endereço."
+          },
+          "id_usuario": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID do usuário associado."
+          },
+          "cep": {
+            "type": "string",
+            "description": "Código de Endereçamento Postal (CEP)."
+          },
+          "rua": {
+            "type": "string",
+            "description": "Logradouro/Rua."
+          },
+          "numero": {
+            "type": "string",
+            "description": "Número do imóvel."
+          },
+          "complemento": {
+            "type": "string",
+            "description": "Complemento do endereço."
+          },
+          "bairro": {
+            "type": "string",
+            "description": "Bairro."
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Cidade."
+          },
+          "estado": {
+            "type": "string",
+            "description": "Sigla do estado (UF)."
+          },
+          "identificador": {
+            "type": "string",
+            "description": "Nome personalizado do endereço (ex: Casa, Trabalho)."
+          },
+          "principal": {
+            "type": "boolean",
+            "description": "Indica se é o endereço principal do usuário."
+          }
+        }
+      },
+      "EnderecoInput": {
+        "type": "object",
+        "required": ["cep", "rua", "numero", "bairro", "cidade", "estado"],
+        "properties": {
+          "cep": {
+            "type": "string"
+          },
+          "rua": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
+          },
+          "complemento": {
+            "type": "string"
+          },
+          "bairro": {
+            "type": "string"
+          },
+          "cidade": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "identificador": {
+            "type": "string"
+          },
+          "principal": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Ong": {
+        "type": "object",
+        "required": ["nome"],
+        "properties": {
+          "id_ong": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true,
+            "description": "Chave primária autoincrementável."
+          },
+          "nome": {
+            "type": "string",
+            "description": "Razão social ou nome fantasia."
+          },
+          "cnpj": {
+            "type": "string",
+            "description": "CNPJ da instituição."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-mail de contato."
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone de contato."
+          },
+          "endereco": {
+            "type": "string",
+            "description": "Endereço completo da sede."
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Breve descrição das causas apoiadas."
+          }
+        }
+      },
+      "OngInput": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "cnpj": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "telefone": {
+            "type": "string"
+          },
+          "endereco": {
+            "type": "string"
+          },
+          "descricao": {
+            "type": "string"
+          }
+        }
+      },
+      "Doacao": {
+        "type": "object",
+        "required": ["id_usuario"],
+        "properties": {
+          "id_doacao": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "id_usuario": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID do usuário doador (Chave estrangeira)."
+          },
+          "id_ong": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "ID da ONG beneficiária (Chave estrangeira)."
+          },
+          "status": {
+            "type": "string",
+            "default": "PENDENTE",
+            "description": "Valores suportados: PENDENTE, APROVADA, CONCLUIDA, CANCELADA."
+          },
+          "data_doacao": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de registro da doação."
+          },
+          "observacao": {
+            "type": "string",
+            "description": "Notas adicionais (ex: detalhes de retirada)."
+          }
+        }
+      },
+      "DoacaoInput": {
+        "type": "object",
+        "properties": {
+          "id_ong": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemDoacao": {
+        "type": "object",
+        "required": ["nome_alimento"],
+        "properties": {
+          "id_item": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nome_alimento": {
+            "type": "string",
+            "description": "Nome do alimento (ex: Arroz, Feijão, Maçã)."
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade doada."
+          },
+          "unidade": {
+            "type": "string",
+            "description": "Unidade de medida (ex: kg, litros, un)."
+          },
+          "data_validade": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de validade do alimento."
+          },
+          "id_doacao": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID da doação pai (Chave estrangeira)."
+          }
+        }
+      },
+      "ItemDoacaoInput": {
+        "type": "object",
+        "properties": {
+          "nome_alimento": {
+            "type": "string"
+          },
+          "quantidade": {
+            "type": "number"
+          },
+          "unidade": {
+            "type": "string"
+          },
+          "data_validade": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  }
+}

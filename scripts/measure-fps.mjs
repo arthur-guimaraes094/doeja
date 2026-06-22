@@ -3,9 +3,6 @@ import http from "http";
 import fs from "fs";
 import puppeteer from "puppeteer-core";
 
-const PORT = 3000;
-const URL = `http://localhost:${PORT}/?perf=true`;
-
 const browserPaths = [
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -21,53 +18,89 @@ function findBrowserPath() {
   return null;
 }
 
-function checkServerReady() {
+function checkServerReady(port) {
   return new Promise((resolve) => {
-    const req = http.get(`http://localhost:${PORT}`, (res) => {
-      resolve(true);
+    const req = http.get(`http://localhost:${port}`, (res) => {
+      const headers = res.headers;
+      const isNextHeader = headers['x-powered-by'] && headers['x-powered-by'].includes('Next.js');
+      
+      let data = "";
+      res.on("data", (chunk) => {
+        data += chunk;
+      });
+      res.on("end", () => {
+        const hasNextIndicator = 
+          data.includes("__NEXT_DATA__") || 
+          data.includes("/_next/static") || 
+          data.includes("next-route-announcer") || 
+          data.includes("DoeJÁ") ||
+          data.includes("doeja");
+        
+        if (isNextHeader || hasNextIndicator) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
     });
+    
     req.on("error", () => {
       resolve(false);
     });
+    
+    req.setTimeout(1500, () => {
+      req.destroy();
+      resolve(false);
+    });
+    
     req.end();
   });
 }
 
-async function waitForServer(timeoutMs = 30000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    const ready = await checkServerReady();
-    if (ready) return true;
-    await new Promise((r) => setTimeout(r, 1000));
+async function findNextjsPort() {
+  const ports = [3000, 3001, 3002, 3003];
+  for (const port of ports) {
+    const ready = await checkServerReady(port);
+    if (ready) return port;
   }
-  return false;
+  return null;
 }
 
 async function main() {
-  console.log("🔍 Verificando se o servidor local está rodando...");
+  console.log("🔍 Verificando se o servidor local do Next.js está rodando...");
   let serverProcess = null;
-  const alreadyRunning = await checkServerReady();
+  let activePort = await findNextjsPort();
 
-  if (!alreadyRunning) {
-    console.log("🚀 Servidor não detectado. Iniciando `npm run dev`...");
-    // Spawning npm run dev
-    // On Windows we should use shell: true to launch npm
-    serverProcess = spawn("npm", ["run", "dev"], {
+  if (!activePort) {
+    console.log("🚀 Servidor Next.js não detectado. Iniciando `npm run dev`...");
+    // Spawning npm run dev (or npm.cmd on Windows to avoid ExecutionPolicy errors)
+    const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+    serverProcess = spawn(npmCmd, ["run", "dev"], {
       cwd: process.cwd(),
       shell: true,
       stdio: "inherit"
     });
 
-    console.log("⏳ Aguardando o Next.js inicializar na porta 3000...");
-    const ready = await waitForServer();
-    if (!ready) {
+    console.log("⏳ Aguardando o Next.js inicializar...");
+    const start = Date.now();
+    const timeoutMs = 30000;
+    while (Date.now() - start < timeoutMs) {
+      activePort = await findNextjsPort();
+      if (activePort) break;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+
+    if (!activePort) {
       console.error("❌ Falha ao iniciar o servidor Next.js.");
       process.exit(1);
     }
-    console.log("✅ Servidor Next.js iniciado com sucesso!");
+    console.log(`✅ Servidor Next.js iniciado com sucesso na porta ${activePort}!`);
   } else {
-    console.log("✅ Servidor local já está rodando na porta 3000.");
+    console.log(`✅ Servidor local do Next.js já está rodando na porta ${activePort}.`);
   }
+
+  const URL = `http://localhost:${activePort}/?perf=true`;
+  console.log(`🔗 Usando URL para o teste: ${URL}`);
 
   const browserPath = findBrowserPath();
   if (!browserPath) {

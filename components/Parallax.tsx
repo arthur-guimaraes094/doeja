@@ -14,18 +14,38 @@ export default function Parallax({ children, speed = 0.12, className = "" }: Par
 
   useEffect(() => {
     let ticking = false;
+    let isVisible = false;
+    let elementMiddle = 0;
+
+    const measure = () => {
+      if (ref.current) {
+        const rect = ref.current.getBoundingClientRect();
+        elementMiddle = window.scrollY + rect.top + rect.height / 2;
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          measure();
+          handleScroll();
+        }
+      },
+      { rootMargin: "20% 0px" }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
     
     const handleScroll = () => {
+      if (!isVisible) return;
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          if (ref.current) {
-            const rect = ref.current.getBoundingClientRect();
-            // Calculate vertical center relative offset
-            const scrollMiddle = window.scrollY + window.innerHeight / 2;
-            const elementMiddle = window.scrollY + rect.top + rect.height / 2;
-            const relativeOffset = (scrollMiddle - elementMiddle) * speed;
-            setOffset(relativeOffset);
-          }
+          const scrollMiddle = window.scrollY + window.innerHeight / 2;
+          const relativeOffset = (scrollMiddle - elementMiddle) * speed;
+          setOffset(relativeOffset);
           ticking = false;
         });
         ticking = true;
@@ -33,11 +53,16 @@ export default function Parallax({ children, speed = 0.12, className = "" }: Par
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Execute once initially
+    window.addEventListener("resize", measure, { passive: true });
+    
+    // Initial measurement
+    measure();
     handleScroll();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", measure);
+      observer.disconnect();
     };
   }, [speed]);
 
@@ -45,7 +70,7 @@ export default function Parallax({ children, speed = 0.12, className = "" }: Par
     <div
       ref={ref}
       className={className}
-      style={{ transform: `translateY(${offset}px)` }}
+      style={{ transform: `translate3d(0, ${offset}px, 0)` }}
     >
       {children}
     </div>

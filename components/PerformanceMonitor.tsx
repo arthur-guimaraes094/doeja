@@ -27,18 +27,20 @@ export default function PerformanceMonitor() {
 
     const updateMetrics = (time: number) => {
       if (previousTimeRef.current !== null) {
-        const delta = time - previousTimeRef.current;
-        setFrameTime(Math.round(delta * 10) / 10);
         framesCountRef.current += 1;
 
         if (lastFpsUpdateRef.current === null) {
           lastFpsUpdateRef.current = time;
         }
 
-        // Update FPS every 500ms
+        // Update metrics every 500ms
         if (time - lastFpsUpdateRef.current >= 500) {
-          const computedFps = Math.round((framesCountRef.current * 1000) / (time - lastFpsUpdateRef.current));
+          const duration = time - lastFpsUpdateRef.current;
+          const computedFps = Math.round((framesCountRef.current * 1000) / duration);
+          const averageFrameTime = Math.round((duration / framesCountRef.current) * 10) / 10;
+
           setFps(computedFps);
+          setFrameTime(averageFrameTime);
           setMinFps((prev) => (computedFps < prev && computedFps > 0 ? computedFps : prev));
           setHistory((prev) => {
             const next = [...prev, computedFps];
@@ -67,7 +69,7 @@ export default function PerformanceMonitor() {
   const isLowFps = fps < 60;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2 p-4 rounded-2xl bg-[#edf2e2]/95 border border-[#4d6617]/20 backdrop-blur-md shadow-lg pointer-events-auto select-none font-sans text-xs w-48 text-[#211a17]">
+    <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2 p-4 rounded-2xl bg-[#edf2e2]/95 border border-surface-tint/20 backdrop-blur-md shadow-lg pointer-events-auto select-none font-sans text-xs w-48 text-[#211a17]">
       <div className="flex justify-between items-center font-bold">
         <span>Monitor de Performance</span>
         <span className={`h-2.5 w-2.5 rounded-full ${isLowFps ? "bg-red-500 animate-pulse" : "bg-primary"}`} />

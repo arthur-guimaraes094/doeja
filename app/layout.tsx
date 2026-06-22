@@ -1,14 +1,18 @@
 import { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import SmoothScroll from "../components/SmoothScroll";
 import PerformanceMonitor from "../components/PerformanceMonitor";
+import PersistentBackground from "../components/PersistentBackground";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
   variable: "--font-plus-jakarta",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -66,10 +70,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${plusJakartaSans.variable} font-sans`}>
+    <html lang="pt-BR" className={plusJakartaSans.variable}>
+      <head />
       <body>
         <SmoothScroll />
         <PerformanceMonitor />
+        <PersistentBackground />
         {children}
         <Analytics />
         <SpeedInsights />
