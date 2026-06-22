@@ -110,8 +110,8 @@ export default function Home() {
                 Comunidade Viva
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Junte-se a mais de 10.000 doadores ativos que estão
-                transformando o Brasil diariamente.
+                Junte-se e vamos juntos
+                transformar o Brasil.
               </p>
             </div>
           </div>

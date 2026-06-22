@@ -52,22 +52,48 @@ export default function PerfilPage() {
   // Address Modal State
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Endereco | null>(null);
+  const [deleteAddressId, setDeleteAddressId] = useState<number | null>(null);
 
-  // Fetch all user data
+  const fetchAddresses = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("endereco")
+      .select("*")
+      .eq("id_usuario", userId)
+      .order("principal", { ascending: false })
+      .order("id_endereco", { ascending: true });
+
+    if (!error && data) {
+      setAddresses(data);
+    }
+  };
+
+  // Fetch all user data and listen for auth state changes
   useEffect(() => {
-    setMounted(true);
-    async function loadUserData() {
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
+
+    let hasLoadedUser = false;
+
+    async function loadUserData(authUser: any) {
       try {
         setLoading(true);
-        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-
-        if (authError || !authUser) {
+        if (!authUser) {
           setUser(null);
+          setProfile({
+            id_usuario: "",
+            nome: "",
+            email: "",
+            telefone: "",
+          });
+          setAddresses([]);
           setLoading(false);
+          window.location.replace("/login");
           return;
         }
 
         setUser(authUser);
+        hasLoadedUser = true;
 
         // Fetch profile
         let { data: profileData, error: profileError } = await supabase
@@ -114,21 +140,58 @@ export default function PerfilPage() {
       }
     }
 
-    loadUserData();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadUserData(session.user);
+      } else {
+        window.location.replace("/login");
+      }
+    });
+
+    // Listen for auth state changes (e.g. logging out from header)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        setUser(null);
+        setProfile({
+          id_usuario: "",
+          nome: "",
+          email: "",
+          telefone: "",
+        });
+        setAddresses([]);
+        setLoading(false);
+        if (hasLoadedUser) {
+          window.location.replace("/");
+        } else {
+          window.location.replace("/login");
+        }
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        loadUserData(session.user);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const fetchAddresses = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("endereco")
-      .select("*")
-      .eq("id_usuario", userId)
-      .order("principal", { ascending: false })
-      .order("id_endereco", { ascending: true });
-
-    if (!error && data) {
-      setAddresses(data);
+  // Lock body scroll and prevent layout shift when any modal is open
+  useEffect(() => {
+    const isAnyModalOpen = isAddressModalOpen || deleteAddressId !== null;
+    if (isAnyModalOpen) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+      document.documentElement.classList.add("lenis-stopped");
+    } else {
+      document.documentElement.classList.remove("lenis-stopped");
+      document.documentElement.style.removeProperty('--scrollbar-width');
     }
-  };
+    return () => {
+      document.documentElement.classList.remove("lenis-stopped");
+      document.documentElement.style.removeProperty('--scrollbar-width');
+    };
+  }, [isAddressModalOpen, deleteAddressId]);
 
   // Masked phone formatting
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,21 +247,24 @@ export default function PerfilPage() {
     }
   };
 
-  // Delete address
-  const handleDeleteAddress = async (id_endereco: number) => {
-    if (!confirm("Tem certeza que deseja remover este endereço?")) return;
+  // Delete address action
+  const confirmDeleteAddress = async () => {
+    if (deleteAddressId === null) return;
 
     try {
       const { error } = await supabase
         .from("endereco")
         .delete()
-        .eq("id_endereco", id_endereco);
+        .eq("id_endereco", deleteAddressId);
 
       if (error) throw error;
-      setAddresses(prev => prev.filter(addr => addr.id_endereco !== id_endereco));
+      setAddresses(prev => prev.filter(addr => addr.id_endereco !== deleteAddressId));
     } catch (err: any) {
       console.error(err);
-      alert("Erro ao excluir endereço.");
+      setProfileError("Erro ao excluir endereço.");
+      setTimeout(() => setProfileError(""), 4000);
+    } finally {
+      setDeleteAddressId(null);
     }
   };
 
@@ -255,8 +321,8 @@ export default function PerfilPage() {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  // Render loading skeleton
-  if (loading) {
+  // Render loading skeleton if loading or user is not logged in
+  if (loading || !user) {
     return (
       <>
         <Header />
@@ -272,40 +338,9 @@ export default function PerfilPage() {
     );
   }
 
-  // Render Not Logged In Screen
-  if (!user) {
-    return (
-      <>
-        <Header />
-        <main className="w-full min-h-[70vh] bg-background text-on-surface flex items-center justify-center py-12 px-margin-mobile">
-          <div className="max-w-md w-full bg-white border border-surface-variant/30 rounded-3xl p-8 text-center shadow-xl space-y-6">
-            <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-8 h-8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-            </div>
-            <div className="space-y-2">
-              <h2 className="font-display text-2xl font-extrabold text-on-surface">Acesso restrito</h2>
-              <p className="font-body-md text-sm text-on-surface-variant/80">
-                Você precisa estar conectado à sua conta para visualizar e gerenciar seu perfil.
-              </p>
-            </div>
-            <Link
-              href="/login"
-              className="block w-full py-4 rounded-2xl bg-secondary text-white font-bold hover:bg-secondary/90 text-center transition-all shadow-sm"
-            >
-              Ir para o Login
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <>
-      <div className={`transition-transform duration-300 ${isAddressModalOpen ? "pointer-events-none select-none scale-[0.99]" : ""}`}>
+      <div className={isAddressModalOpen || deleteAddressId !== null ? "pointer-events-none select-none" : ""}>
         <Header />
 
         <main className="w-full min-h-screen bg-background text-on-surface py-12 px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto flex flex-col gap-10">
@@ -512,7 +547,7 @@ export default function PerfilPage() {
                       {/* Delete Icon Button */}
                       <button
                         type="button"
-                        onClick={() => handleDeleteAddress(addr.id_endereco)}
+                        onClick={() => setDeleteAddressId(addr.id_endereco)}
                         className="w-9 h-9 rounded-full hover:bg-red-50 text-on-surface-variant/60 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer"
                         title="Excluir Endereço"
                       >
@@ -567,6 +602,13 @@ export default function PerfilPage() {
         }}
       />
 
+      {/* Delete Address Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteAddressId !== null}
+        onClose={() => setDeleteAddressId(null)}
+        onConfirm={confirmDeleteAddress}
+      />
+
         <Footer />
       </div>
     </>
@@ -591,6 +633,7 @@ function AddressModal({
   onAddressSaved,
 }: AddressModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [activePreset, setActivePreset] = useState<"Casa" | "Trabalho" | "Outro">("Casa");
   const [addressFormData, setAddressFormData] = useState({
     cep: "",
     rua: "",
@@ -606,36 +649,43 @@ function AddressModal({
   const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      if (editingAddress) {
-        setAddressFormData({
-          cep: editingAddress.cep,
-          rua: editingAddress.rua,
-          numero: editingAddress.numero,
-          complemento: editingAddress.complemento || "",
-          bairro: editingAddress.bairro,
-          cidade: editingAddress.cidade,
-          estado: editingAddress.estado,
-          identificador: editingAddress.identificador || "Casa",
-          principal: editingAddress.principal,
-        });
-      } else {
-        setAddressFormData({
-          cep: "",
-          rua: "",
-          numero: "",
-          complemento: "",
-          bairro: "",
-          cidade: "",
-          estado: "",
-          identificador: "Casa",
-          principal: false,
-        });
-      }
+      const id = editingAddress?.identificador || "Casa";
+      const preset = (id === "Casa" || id === "Trabalho") ? id : "Outro";
+
+      const data = editingAddress
+        ? {
+            cep: editingAddress.cep,
+            rua: editingAddress.rua,
+            numero: editingAddress.numero,
+            complemento: editingAddress.complemento || "",
+            bairro: editingAddress.bairro,
+            cidade: editingAddress.cidade,
+            estado: editingAddress.estado,
+            identificador: id,
+            principal: editingAddress.principal,
+          }
+        : {
+            cep: "",
+            rua: "",
+            numero: "",
+            complemento: "",
+            bairro: "",
+            cidade: "",
+            estado: "",
+            identificador: "Casa",
+            principal: false,
+          };
+      setTimeout(() => {
+        setActivePreset(preset as any);
+        setAddressFormData(data);
+      }, 0);
     }
   }, [editingAddress, isOpen]);
 
@@ -754,52 +804,55 @@ function AddressModal({
         width: "100vw",
         height: "100vh",
       }}
+      data-lenis-prevent
     >
       {/* Modal Card */}
       <div 
-        className="relative bg-white border border-surface-variant/10 rounded-[32px] overflow-y-auto shadow-2xl p-6 md:p-8 text-left flex flex-col gap-6 cursor-default"
+        className="relative bg-white border border-surface-variant/10 rounded-[24px] md:rounded-[32px] overflow-y-auto md:overflow-y-visible shadow-2xl p-5 md:p-6 text-left flex flex-col gap-4 md:gap-5 cursor-default w-full max-w-[540px] max-h-[90vh] md:max-h-none"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "100%",
-          maxWidth: "576px",
-          maxHeight: "90vh",
-        }}
+        data-lenis-prevent
       >
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-surface-variant/10 pb-4">
-          <h3 className="font-display text-2xl font-bold text-primary">
+        <div className="flex items-center justify-between border-b border-surface-variant/10 pb-3">
+          <h3 className="font-display text-xl md:text-2xl font-bold text-primary">
             {editingAddress ? "Editar Endereço" : "Novo Endereço"}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full hover:bg-surface-variant/20 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-all cursor-pointer"
+            className="w-8 h-8 rounded-full hover:bg-surface-variant/20 flex items-center justify-center text-on-surface-variant/60 hover:text-on-surface transition-all cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-4 h-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSaveAddress} className="space-y-4">
+        <form onSubmit={handleSaveAddress} className="space-y-3 md:space-y-3.5">
           
           {/* Presets Identificador */}
-          <div className="space-y-2">
-            <label className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+          <div className="space-y-1.5">
+            <label className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
               Identificador do Endereço
             </label>
             <div className="flex gap-2">
               {["Casa", "Trabalho", "Outro"].map((type) => {
-                const isSelected = addressFormData.identificador === type || 
-                  (type === "Outro" && addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho");
+                const isSelected = activePreset === type;
                 return (
                   <button
                     key={type}
                     type="button"
-                    onClick={() => setAddressFormData(prev => ({ ...prev, identificador: type }))}
-                    className={`px-4 py-2.5 rounded-full font-bold text-xs transition-all border cursor-pointer ${
+                    onClick={() => {
+                      setActivePreset(type as any);
+                      if (type === "Casa" || type === "Trabalho") {
+                        setAddressFormData(prev => ({ ...prev, identificador: type }));
+                      } else {
+                        setAddressFormData(prev => ({ ...prev, identificador: "" }));
+                      }
+                    }}
+                    className={`px-3.5 py-1.5 rounded-full font-bold text-xs transition-all border cursor-pointer ${
                       isSelected
                         ? "bg-primary text-white border-primary"
                         : "bg-[#fff8f6] text-on-surface-variant/80 border-outline-variant hover:border-on-surface-variant/40"
@@ -814,21 +867,34 @@ function AddressModal({
             </div>
             
             {/* Custom Label Input if Outro is selected */}
-            {addressFormData.identificador !== "Casa" && addressFormData.identificador !== "Trabalho" && (
+            {activePreset === "Outro" && (
               <input
                 type="text"
-                value={addressFormData.identificador === "Outro" ? "" : addressFormData.identificador}
-                onChange={(e) => setAddressFormData(prev => ({ ...prev, identificador: e.target.value || "Outro" }))}
+                value={addressFormData.identificador}
+                onChange={(e) => setAddressFormData(prev => ({ ...prev, identificador: e.target.value }))}
+                onBlur={(e) => {
+                  const val = e.target.value.trim();
+                  const lowerVal = val.toLowerCase();
+                  if (lowerVal === "casa") {
+                    setActivePreset("Casa");
+                    setAddressFormData(prev => ({ ...prev, identificador: "Casa" }));
+                  } else if (lowerVal === "trabalho") {
+                    setActivePreset("Trabalho");
+                    setAddressFormData(prev => ({ ...prev, identificador: "Trabalho" }));
+                  } else if (val === "") {
+                    setAddressFormData(prev => ({ ...prev, identificador: "Outro" }));
+                  }
+                }}
                 placeholder="Ex: Casa de Campo, Mãe, etc."
-                className="w-full mt-2 px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full mt-1.5 px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
               />
             )}
           </div>
 
           {/* Grid 1: CEP */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label htmlFor="cep" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label htmlFor="cep" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 CEP *
               </label>
               <div className="relative">
@@ -838,7 +904,7 @@ function AddressModal({
                   value={addressFormData.cep}
                   onChange={handleCepChange}
                   placeholder="59000-000"
-                  className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                   required
                 />
                 {loadingCep && (
@@ -847,8 +913,8 @@ function AddressModal({
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="estado" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+            <div className="space-y-1">
+              <label htmlFor="estado" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 Estado (UF) *
               </label>
               <input
@@ -857,16 +923,16 @@ function AddressModal({
                 value={addressFormData.estado}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, estado: e.target.value.toUpperCase().slice(0, 2) }))}
                 placeholder="RN"
-                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                 required
               />
             </div>
           </div>
 
           {/* Grid 2: Cidade & Bairro */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label htmlFor="cidade" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label htmlFor="cidade" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 Cidade *
               </label>
               <input
@@ -875,13 +941,13 @@ function AddressModal({
                 value={addressFormData.cidade}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, cidade: e.target.value }))}
                 placeholder="Natal"
-                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                 required
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="bairro" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+            <div className="space-y-1">
+              <label htmlFor="bairro" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 Bairro *
               </label>
               <input
@@ -890,16 +956,16 @@ function AddressModal({
                 value={addressFormData.bairro}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, bairro: e.target.value }))}
                 placeholder="Lagoa Nova"
-                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                 required
               />
             </div>
           </div>
 
           {/* Grid 3: Rua & Numero */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2 space-y-1.5">
-              <label htmlFor="rua" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="md:col-span-2 space-y-1">
+              <label htmlFor="rua" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 Rua / Avenida *
               </label>
               <input
@@ -908,13 +974,13 @@ function AddressModal({
                 value={addressFormData.rua}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, rua: e.target.value }))}
                 placeholder="Av. Senador Salgado Filho"
-                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                 required
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label htmlFor="numero" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+            <div className="space-y-1">
+              <label htmlFor="numero" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
                 Número *
               </label>
               <input
@@ -923,15 +989,15 @@ function AddressModal({
                 value={addressFormData.numero}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, numero: e.target.value }))}
                 placeholder="123"
-                className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
                 required
               />
             </div>
           </div>
 
           {/* Complemento */}
-          <div className="space-y-1.5">
-            <label htmlFor="complemento" className="font-label-md text-xs font-bold text-on-surface-variant/80 uppercase tracking-wider block">
+          <div className="space-y-1">
+            <label htmlFor="complemento" className="font-label-md text-[11px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">
               Complemento
             </label>
             <input
@@ -940,42 +1006,42 @@ function AddressModal({
               value={addressFormData.complemento}
               onChange={(e) => setAddressFormData(prev => ({ ...prev, complemento: e.target.value }))}
               placeholder="Apto 402, Bloco B"
-              className="w-full px-5 py-3 rounded-2xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-body-md text-on-surface"
+              className="w-full px-4 py-2.5 rounded-xl bg-[#fff8f6] border border-outline-variant/60 focus:border-primary outline-none transition-all font-body-md text-sm text-on-surface"
             />
           </div>
 
           {/* Set Principal Checkbox */}
           {addressesCount > 0 && (
-            <div className="flex items-center gap-2.5 py-1.5">
+            <div className="flex items-center gap-2.5 py-1">
               <input
                 id="principal"
                 type="checkbox"
                 checked={addressFormData.principal}
                 onChange={(e) => setAddressFormData(prev => ({ ...prev, principal: e.target.checked }))}
-                className="w-5 h-5 accent-primary border-outline-variant rounded-md cursor-pointer"
+                className="w-4 h-4 accent-primary border-outline-variant rounded-md cursor-pointer"
               />
-              <label htmlFor="principal" className="font-body-md text-sm text-on-surface font-medium cursor-pointer select-none">
+              <label htmlFor="principal" className="font-body-md text-xs text-on-surface font-medium cursor-pointer select-none">
                 Definir como endereço principal
               </label>
             </div>
           )}
 
           {/* Submit Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-surface-variant/10">
+          <div className="flex gap-3 pt-3 border-t border-surface-variant/10">
             <button
               type="button"
               onClick={onClose}
-              className="w-1/2 py-3.5 rounded-2xl border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-variant/10 transition-all cursor-pointer text-center text-sm"
+              className="w-1/2 py-2.5 rounded-xl border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-variant/10 transition-all cursor-pointer text-center text-xs"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={savingAddress}
-              className="w-1/2 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-primary text-white font-bold hover:bg-primary/95 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 text-sm shadow-xs"
+              className="w-1/2 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary/95 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 text-xs shadow-xs"
             >
               {savingAddress ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               ) : (
                 "Salvar Endereço"
               )}
@@ -984,6 +1050,76 @@ function AddressModal({
 
         </form>
 
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+interface DeleteConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+function DeleteConfirmModal({ isOpen, onClose, onConfirm }: DeleteConfirmModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
+    <div
+      className="fixed z-50 flex items-center justify-center p-4 bg-black/45 cursor-pointer"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+      }}
+      data-lenis-prevent
+    >
+      {/* Modal Card */}
+      <div
+        className="relative bg-white border border-surface-variant/10 rounded-[24px] md:rounded-[28px] shadow-2xl p-6 text-center flex flex-col items-center gap-4 cursor-default w-full max-w-[340px] animate-fade-in-scale"
+        onClick={(e) => e.stopPropagation()}
+        data-lenis-prevent
+      >
+
+        {/* Modal Info */}
+        <div className="space-y-1.5">
+          <h3 className="font-display text-lg font-extrabold text-on-surface">
+            Remover Endereço?
+          </h3>
+          <p className="font-body-md text-xs text-on-surface-variant/80 leading-relaxed">
+            Tem certeza que deseja remover este endereço? Essa ação não poderá ser desfeita.
+          </p>
+        </div>
+
+        {/* Submit Buttons */}
+        <div className="flex gap-3 w-full pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-1/2 py-2.5 rounded-xl border border-outline-variant text-on-surface-variant font-bold hover:bg-surface-variant/10 transition-all cursor-pointer text-center text-xs"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="w-1/2 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all cursor-pointer text-center text-xs shadow-xs"
+          >
+            Confirmar
+          </button>
+        </div>
       </div>
     </div>,
     document.body

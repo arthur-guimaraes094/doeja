@@ -28,10 +28,12 @@ export default function LoginPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const remember = localStorage.getItem("doeja_remember_me") !== "false";
-      setFormData((prev) => ({
-        ...prev,
-        rememberMe: remember,
-      }));
+      setTimeout(() => {
+        setFormData((prev) => ({
+          ...prev,
+          rememberMe: remember,
+        }));
+      }, 0);
     }
   }, []);
 

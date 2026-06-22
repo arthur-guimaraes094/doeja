@@ -45,14 +45,14 @@ export default function Header() {
   }, [isDropdownOpen]);
 
   useEffect(() => {
-    setIsMounted(true);
+    setTimeout(() => {
+      setIsMounted(true);
+      if (hasInitialized) {
+        setUser(cachedUser);
+        setIsLoading(false);
+      }
+    }, 0);
     hasHydratedGlobal = true;
-
-    // Se já estiver inicializado no cache, atualiza o estado local imediatamente ao montar
-    if (hasInitialized) {
-      setUser(cachedUser);
-      setIsLoading(false);
-    }
 
     // Obter sessão inicial do usuário
     supabase.auth.getSession().then(({ data: { session } }) => {

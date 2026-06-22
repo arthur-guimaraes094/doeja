@@ -1,10 +1,19 @@
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import SmoothScroll from "../components/SmoothScroll";
 import PerformanceMonitor from "../components/PerformanceMonitor";
 import PersistentBackground from "../components/PersistentBackground";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.doeja.me"),
@@ -61,12 +70,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="pt-BR" className={plusJakartaSans.variable}>
+      <head />
       <body>
         <SmoothScroll />
         <PerformanceMonitor />
