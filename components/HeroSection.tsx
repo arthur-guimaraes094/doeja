@@ -40,7 +40,7 @@ export default function HeroSection() {
           </h1>
           <p className="hero-subtitle font-headline-md text-[20px] md:text-[24px] text-on-surface" style={{ opacity: 0 }}>
             <span className="text-primary font-extrabold">Doe</span>
-            <span className="text-secondary font-extrabold">JÁ</span> e leve
+            <span className="text-secondary-container font-extrabold">JÁ</span> e leve
             mais do que alimento, leve{" "}
             <span className="text-primary font-extrabold">cuidado</span> e{" "}
             <span className="text-primary font-extrabold">esperança</span>.
