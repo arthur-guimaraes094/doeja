@@ -10,8 +10,8 @@ Este guia foi feito pensando especialmente em você que está iniciando no proje
 
 Nós usamos o **Next.js 16** com o padrão **App Router**. Isso significa que as páginas da aplicação são criadas dentro da pasta `app/`.
 
-*   [app/layout.tsx](file:///c:/Users/x990351/Documents/DoeJA/app/layout.tsx): É o "esqueleto" que envolve todas as páginas do site. Ele carrega as fontes, os estilos gerais e os metadados (título e descrição para buscadores como o Google).
-*   [app/page.tsx](file:///c:/Users/x990351/Documents/DoeJA/app/page.tsx): É a nossa página inicial atual.
+*   [app/layout.tsx](file:///c:/Users/x990351/Estudos/doeja/app/layout.tsx): É o "esqueleto" que envolve todas as páginas do site. Ele carrega as fontes, os estilos gerais e os metadados (título e descrição para buscadores como o Google).
+*   [app/page.tsx](file:///c:/Users/x990351/Estudos/doeja/app/page.tsx): É a nossa página inicial atual.
 *   `/components`: Pasta com pedacinhos visuais reutilizáveis (como o `Header` e o `Footer`).
 *   `/public`: Onde guardamos imagens, ícones e logos.
 
@@ -43,9 +43,9 @@ Nós usamos o **Tailwind CSS v4** para estilizar nossa interface. Ele permite ad
 Uma página web rápida é essencial para que os usuários consigam doar comida sem travamentos. Por isso, preste muita atenção nas imagens:
 
 ### Por que não devemos usar SVGs gigantescos no Canvas flutuante?
-O nosso fundo interativo com frutas e vegetais flutuantes ([FloatingVegetables2D.tsx](file:///c:/Users/x990351/Documents/DoeJA/components/FloatingVegetables2D.tsx)) desenha imagens continuamente na tela.
+O nosso fundo interativo com frutas e vegetais flutuantes ([FloatingVegetables2D.tsx](file:///c:/Users/x990351/Estudos/doeja/components/FloatingVegetables2D.tsx)) desenha imagens continuamente na tela.
 *   **SVGs originais:** São arquivos de vetor complexos de **até 7MB cada** (totalizando mais de 26MB). Carregar isso no celular do usuário consome toda a franquia de dados e faz o celular travar/esquentar devido ao esforço de processar milhares de curvas vetoriais a 60 frames por segundo.
-*   **A Solução (WebP):** O formato WebP é uma imagem moderna, muito leve (de 20KB a 40KB) e ideal para o Canvas.
+*   **A Solução (WebP + Desativação em Mobile):** O formato WebP é uma imagem moderna, muito leve (de 20KB a 40KB) e ideal para o Canvas. Além disso, **o canvas de vegetais flutuantes é completamente desativado em dispositivos móveis** (telas < 768px de largura) para preservar a vida útil da bateria e evitar gargalos de renderização.
 
 > 🎉 **Sucesso:** O projeto já foi totalmente migrado para carregar as imagens `.webp` otimizadas no canvas! Caso novos elementos sejam incluídos no futuro, certifique-se de seguir o mesmo fluxo de otimização descrito abaixo.
 
@@ -92,7 +92,7 @@ Nós usamos o **Vitest** para testar nosso código de lógica e garantir que alt
 
 ### Onde ficam os testes?
 Eles devem ficar na mesma pasta que a funcionalidade que você está desenvolvendo, terminando com `.test.ts` (ou `.test.tsx`). 
-Veja um exemplo didático em [cn.test.ts](file:///c:/Users/x990351/Documents/DoeJA/lib/utils/cn.test.ts).
+Veja um exemplo didático em [cn.test.ts](file:///c:/Users/x990351/Estudos/doeja/lib/utils/cn.test.ts).
 
 ### Como rodar os testes localmente:
 1. Abra o terminal na raiz do projeto.

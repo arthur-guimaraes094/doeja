@@ -10,9 +10,9 @@ Este documento foi pensado especialmente para **desenvolvedores que estão ingre
 
 Para facilitar a sua ambientação e garantir a conformidade do código, consulte os guias abaixo:
 
-*   📖 **[Guia de Diretrizes de Desenvolvimento](file:///c:/Documentos/DoeJA/docs/DEVELOPER_GUIDELINES.md):** Manual completo de boas práticas, estrutura de código, regras do Tailwind v4, otimização de imagens/LCP e instruções de performance.
-*   🎨 **[Guia do Design System](file:///c:/Documentos/DoeJA/DESIGN.md):** Especificações de cores, tipografia, espaçamentos, sombras e identidade de marca.
-*   🤖 **[Regras de Agentes (Pair Programming)](file:///c:/Documentos/DoeJA/AGENTS.md):** Padrões e diretrizes locais para assistentes de inteligência artificial de pair programming.
+*   📖 **[Guia de Diretrizes de Desenvolvimento](file:///c:/Users/x990351/Estudos/doeja/docs/DEVELOPER_GUIDELINES.md):** Manual completo de boas práticas, estrutura de código, regras do Tailwind v4, otimização de imagens/LCP e instruções de performance.
+*   🎨 **[Guia do Design System](file:///c:/Users/x990351/Estudos/doeja/DESIGN.md):** Especificações de cores, tipografia, espaçamentos, sombras e identidade de marca.
+*   🤖 **[Regras de Agentes (Pair Programming)](file:///c:/Users/x990351/Estudos/doeja/AGENTS.md):** Padrões e diretrizes locais para assistentes de inteligência artificial de pair programming.
 
 ---
 
@@ -92,11 +92,15 @@ Aqui está um mapa resumido do projeto para você saber exatamente onde encontra
 ```
 doeja/
 ├── app/                    # Páginas, layouts e estilos globais (Next.js App Router)
+│   ├── docs/               # Rota da documentação interativa da API via Scalar
+│   │   └── page.tsx        # Página da documentação com Skeleton Loader premium
+│   ├── login/              # Rota da página de login com formulário e animações
+│   │   └── page.tsx        # Página de login com transições GSAP e validações
 │   ├── globals.css         # Importações do Tailwind v4 e estilos globais
 │   ├── layout.tsx          # Layout base comum a todas as páginas (Fontes e metadados SEO)
 │   └── page.tsx            # A página inicial (Landing Page principal do projeto)
 ├── components/             # Componentes visuais reutilizáveis (Header, Footer, Canvas)
-│   ├── FloatingVegetables2D.tsx # Fundo de vegetais animados no Canvas
+│   ├── FloatingVegetables2D.tsx # Fundo de vegetais animados no Canvas (desativado em mobile)
 │   ├── Header.tsx          # Menu de navegação superior
 │   └── Footer.tsx          # Rodapé da página
 ├── lib/                    # Códigos utilitários globais
@@ -105,6 +109,8 @@ doeja/
 │       └── cn.test.ts      # Testes unitários da função auxiliar
 ├── docs/                   # Diretrizes, especificações e documentações
 │   └── DEVELOPER_GUIDELINES.md # Guia didático de desenvolvimento para iniciantes
+├── public/                 # Imagens, vídeos e arquivos estáticos públicos
+│   └── openapi.json        # Especificação OpenAPI/Swagger estática do projeto
 ├── tsconfig.json           # Configurações do TypeScript (Strict Mode habilitado!)
 ├── vitest.config.ts        # Configurações de execução de testes com Vitest
 └── package.json            # Scripts de execução e dependências instaladas
@@ -136,10 +142,10 @@ Qualquer elemento que puder ser reutilizado em mais de uma página (ex: Botões 
 *   Dê preferência a nomes de componentes em `PascalCase` (ex: `Header.tsx`, `HandsSvg.tsx`).
 
 ### C. Estilização: Tailwind CSS v4
-Nós usamos **Tailwind CSS v4** para construir e estilizar a interface. O design adotado é unificado e focado na estética orgânica e amigável, definida no arquivo [globals.css](file:///c:/Users/x990351/Documents/DoeJA/app/globals.css).
+Nós usamos **Tailwind CSS v4** para construir e estilizar a interface. O design adotado é unificado e focado na estética orgânica e amigável, definida no arquivo [globals.css](file:///c:/Users/x990351/Estudos/doeja/app/globals.css).
 
 *   Sempre utilize as variáveis e classes utilitárias de espaçamento e cores do nosso design system (como `bg-background`, `text-on-surface`, `px-margin-desktop`, `gap-md`).
-*   Consulte mais detalhes didáticos sobre como estilizar e trabalhar com o CSS em nosso [Guia de Diretrizes de Desenvolvimento](file:///c:/Users/x990351/Documents/DoeJA/docs/DEVELOPER_GUIDELINES.md).
+*   Consulte mais detalhes didáticos sobre como estilizar e trabalhar com o CSS em nosso [Guia de Diretrizes de Desenvolvimento](file:///c:/Users/x990351/Estudos/doeja/docs/DEVELOPER_GUIDELINES.md).
 
 ### D. Concatenação Segura de Classes com `cn`
 Quando você precisar aplicar classes CSS de forma condicional, ou aceitar estilos adicionais via props no seu componente, use a função utilitária `cn` localizada em `lib/utils/cn.ts`. Ela une o `clsx` com o `tailwind-merge` para evitar que classes Tailwind conflitantes se quebrem mutuamente.
