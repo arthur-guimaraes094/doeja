@@ -144,12 +144,12 @@ export default function Home() {
         </section>
 
         {/* Floating Action Button (FAB) */}
-        <div className="fixed bottom-margin-mobile right-margin-mobile md:bottom-md md:right-md z-50">
+        {/* <div className="fixed bottom-margin-mobile right-margin-mobile md:bottom-md md:right-md z-50">
           <button className="bg-secondary text-white px-5 py-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-sm cursor-pointer hover:shadow-secondary/20">
             <HeartHandshakeIcon size={24} aria-hidden="true" />
             <span className="font-label-md hidden md:block">Doar Agora</span>
           </button>
-        </div>
+        </div> */}
 
         {/* Footer */}
         <Footer />
