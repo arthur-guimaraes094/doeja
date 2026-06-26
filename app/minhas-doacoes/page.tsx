@@ -25,12 +25,27 @@ interface Ong {
   descricao?: string;
 }
 
+interface Endereco {
+  id_endereco: number;
+  cep: string;
+  rua: string;
+  numero: string;
+  complemento?: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  identificador?: string;
+}
+
 interface Donation {
   id_doacao: number;
-  status: "PENDENTE" | "APROVADA" | "CONCLUIDA" | "CANCELADA";
+  status: "PENDENTE" | "APROVADA" | "CONCLUIDA" | "CANCELADA" | "RETIRADA";
   data_doacao: string;
   observacao?: string;
   id_ong?: number;
+  id_endereco?: number | null;
+  endereco_customizado?: string | null;
+  endereco?: Endereco | null;
   ongs?: Ong | null;
   item_doacao?: ItemDoacao[];
 }
@@ -56,6 +71,18 @@ export default function MinhasDoacoesPage() {
           data_doacao,
           observacao,
           id_ong,
+          id_endereco,
+          endereco_customizado,
+          endereco (
+            id_endereco,
+            cep,
+            rua,
+            numero,
+            complemento,
+            bairro,
+            cidade,
+            estado
+          ),
           ongs (
             id_ong,
             nome,
@@ -244,7 +271,7 @@ export default function MinhasDoacoesPage() {
     if (primaryItemName.includes("arroz")) {
       return "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=400";
     } else if (primaryItemName.includes("feijão") || primaryItemName.includes("feijao")) {
-      return "https://images.unsplash.com/photo-1551462147-ff29053bfc14?auto=format&fit=crop&q=80&w=400";
+      return "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=400";
     } else if (primaryItemName.includes("leite")) {
       return "https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&q=80&w=400";
     } else if (primaryItemName.includes("legume") || primaryItemName.includes("fruta") || primaryItemName.includes("verdura") || primaryItemName.includes("vegetal") || primaryItemName.includes("orgânico") || primaryItemName.includes("organico")) {
@@ -284,6 +311,11 @@ export default function MinhasDoacoesPage() {
         return {
           text: "Cancelada",
           classes: "bg-red-50 text-red-800 border border-red-200/80",
+        };
+      case "RETIRADA":
+        return {
+          text: "Retirada",
+          classes: "bg-violet-50 text-violet-800 border border-violet-200/80",
         };
       default:
         return {
@@ -329,6 +361,37 @@ export default function MinhasDoacoesPage() {
               Gerencie e acompanhe o andamento dos alimentos que você disponibilizou para doação.
             </p>
           </div>
+
+          {/* New Donation CTA Banner */}
+          {donations.length > 0 && (
+            <section className="tactile-card bg-surface-container-low border border-secondary/15 p-6 md:p-8 rounded-[32px] flex flex-col md:flex-row items-center justify-between gap-6 shadow-md w-full animate-fade-in-scale text-left">
+              <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                <div className="relative w-20 h-20 shrink-0 hidden md:block">
+                  <Image
+                    src="/caixa-doacao.webp"
+                    alt="Caixa de Doação"
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-display text-xl md:text-2xl font-extrabold text-secondary">
+                    Quer fazer mais uma boa ação?
+                  </h3>
+                  <p className="font-body-lg text-sm md:text-base text-on-surface-variant max-w-[550px] font-medium">
+                    Cadastre novos alimentos para doação e ajude ONGs locais a alimentar quem mais precisa. O processo leva menos de um minuto!
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/doar"
+                className="px-6 py-3.5 rounded-full bg-secondary text-white font-bold hover:bg-secondary/95 active:scale-[0.98] transition-all shadow-md hover:scale-105 shrink-0 text-sm md:text-base w-full md:w-auto text-center cursor-pointer"
+              >
+                Nova Doação
+              </Link>
+            </section>
+          )}
 
           {/* Donations List Container */}
           {donations.length > 0 ? (
@@ -395,6 +458,30 @@ export default function MinhasDoacoesPage() {
                           ) : (
                             <p className="text-xs text-on-surface-variant/50">Nenhum item registrado.</p>
                           )}
+                        </div>
+
+                        {/* Pickup Location */}
+                        <div className="space-y-1 bg-surface-container-lowest border border-outline-variant/35 p-3 rounded-2xl text-left">
+                          <h5 className="font-label-md text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-wider">
+                            Local de Retirada
+                          </h5>
+                          <p className="font-body-md text-xs text-on-surface-variant/90 leading-relaxed">
+                            {(() => {
+                              const savedAddr = donation.endereco;
+                              const customAddr = donation.endereco_customizado;
+                              if (savedAddr) {
+                                return `${savedAddr.rua}, ${savedAddr.numero} ${savedAddr.complemento ? `- ${savedAddr.complemento}` : ""} - ${savedAddr.bairro}, ${savedAddr.cidade}/${savedAddr.estado}`;
+                              } else if (customAddr) {
+                                try {
+                                  const parsed = JSON.parse(customAddr);
+                                  return `${parsed.rua}, ${parsed.numero} ${parsed.complemento ? `- ${parsed.complemento}` : ""} - ${parsed.bairro}, ${parsed.cidade}/${parsed.estado}`;
+                                } catch {
+                                  return customAddr;
+                                }
+                              }
+                              return "Não especificado (endereço principal)";
+                            })()}
+                          </p>
                         </div>
 
                         {/* Observation */}
@@ -486,6 +573,19 @@ export default function MinhasDoacoesPage() {
                               Confirmar Entrega
                             </button>
                           </>
+                        )}
+
+                        {donation.status === "RETIRADA" && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmModalId(donation.id_doacao)}
+                            className="w-full py-3.5 rounded-2xl bg-secondary text-white font-bold hover:bg-secondary/95 active:scale-[0.98] transition-all cursor-pointer text-center text-sm shadow-xs flex items-center justify-center gap-2"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            Confirmar Entrega
+                          </button>
                         )}
                       </div>
                     </div>

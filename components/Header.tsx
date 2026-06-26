@@ -6,12 +6,14 @@ import { supabase } from "@/lib/supabase";
 
 // Module-level cache (client-only persistent memory across mounts)
 let cachedUser: any = null;
+let cachedIsOng = false;
 let hasInitialized = false;
 let hasHydratedGlobal = false;
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [user, setUser] = useState<any>(cachedUser);
+  const [isOng, setIsOng] = useState<boolean>(cachedIsOng);
   const [isLoading, setIsLoading] = useState(!hasInitialized);
   const [isMounted, setIsMounted] = useState(hasHydratedGlobal);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -45,10 +47,29 @@ export default function Header() {
   }, [isDropdownOpen]);
 
   useEffect(() => {
+    const checkUserType = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from("usuario")
+          .select("tipo")
+          .eq("id_usuario", userId)
+          .maybeSingle();
+        
+        if (!error && data) {
+          const ongVal = data.tipo === "ong";
+          cachedIsOng = ongVal;
+          setIsOng(ongVal);
+        }
+      } catch (err) {
+        console.error("Erro ao obter tipo do usuário no header:", err);
+      }
+    };
+
     setTimeout(() => {
       setIsMounted(true);
       if (hasInitialized) {
         setUser(cachedUser);
+        setIsOng(cachedIsOng);
         setIsLoading(false);
       }
     }, 0);
@@ -61,6 +82,9 @@ export default function Header() {
       hasInitialized = true;
       setUser(u);
       setIsLoading(false);
+      if (u) {
+        checkUserType(u.id);
+      }
     });
 
     // Ouvir mudanças no estado de autenticação
@@ -70,6 +94,12 @@ export default function Header() {
       hasInitialized = true;
       setUser(u);
       setIsLoading(false);
+      if (u) {
+        checkUserType(u.id);
+      } else {
+        cachedIsOng = false;
+        setIsOng(false);
+      }
     });
 
     return () => {
@@ -201,12 +231,29 @@ export default function Header() {
                   >
                     Meu Perfil
                   </Link>
+                  {isOng ? (
+                    <Link
+                      href="/resgates"
+                      className="block px-4 py-2.5 text-body-md text-on-surface-variant hover:bg-primary-container/10 hover:text-primary transition-colors font-medium"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Resgates
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/minhas-doacoes"
+                      className="block px-4 py-2.5 text-body-md text-on-surface-variant hover:bg-primary-container/10 hover:text-primary transition-colors font-medium"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Minhas Doações
+                    </Link>
+                  )}
                   <Link
-                    href="/minhas-doacoes"
+                    href="/chat"
                     className="block px-4 py-2.5 text-body-md text-on-surface-variant hover:bg-primary-container/10 hover:text-primary transition-colors font-medium"
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    Minhas Doações
+                    Mensagens
                   </Link>
                   <div className="border-t border-surface-variant/10 my-1"></div>
                   <button

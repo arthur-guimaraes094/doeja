@@ -33,10 +33,17 @@ export default async function DonationsPage() {
         id_doacao,
         doacao (
           id_doacao,
+          id_usuario,
           status,
           data_doacao,
           observacao,
-          usuario (
+          id_endereco,
+          endereco_customizado,
+          endereco (
+            bairro,
+            cidade
+          ),
+          usuario!doacao_id_usuario_fkey (
             nome,
             endereco (
               bairro,
@@ -57,16 +64,29 @@ export default async function DonationsPage() {
       donations = validData.map((item: any) => {
         const doacao = item.doacao;
         const usuario = doacao?.usuario;
-        const enderecos = usuario?.endereco;
-        
-        // Obter o endereço principal ou o primeiro disponível
-        const endereco = Array.isArray(enderecos)
-          ? (enderecos.find((e: any) => e.principal) || enderecos[0])
-          : enderecos;
+        const customAddr = doacao?.endereco_customizado;
+        const selectedSavedAddr = doacao?.endereco;
 
-        const location = endereco
-          ? `${endereco.cidade}, ${endereco.bairro}`
-          : "Natal, Centro"; // Fallback caso não possua endereço
+        let location = "Natal, Centro";
+        if (selectedSavedAddr) {
+          location = `${selectedSavedAddr.cidade}, ${selectedSavedAddr.bairro}`;
+        } else if (customAddr) {
+          try {
+            const parsed = JSON.parse(customAddr);
+            location = `${parsed.cidade}, ${parsed.bairro}`;
+          } catch {
+            location = customAddr;
+          }
+        } else {
+          // Fallback to donor's default address (backward compatibility)
+          const enderecos = usuario?.endereco;
+          const userAddr = Array.isArray(enderecos)
+            ? (enderecos.find((e: any) => e.principal) || enderecos[0])
+            : enderecos;
+          if (userAddr) {
+            location = `${userAddr.cidade}, ${userAddr.bairro}`;
+          }
+        }
 
         // Formatação do tempo/data da doação
         const dataDoacaoStr = doacao?.data_doacao;
@@ -122,6 +142,8 @@ export default async function DonationsPage() {
 
         return {
           id: item.id_item.toString(),
+          id_doacao: Number(doacao?.id_doacao),
+          id_doador: doacao?.id_usuario,
           title: `${item.quantidade} ${item.unidade} de ${item.nome_alimento}`,
           donor: usuario?.nome || "Doador Anônimo",
           location,

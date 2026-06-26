@@ -2,9 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export interface Donation {
   id: string;
+  id_doacao: number;
+  id_doador: string;
   title: string;
   donor: string;
   location: string;
@@ -20,10 +24,32 @@ interface DonationsListProps {
 }
 
 export default function DonationsList({ initialDonations }: DonationsListProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("recentes"); // "recentes" | "proximas" | "urgentes"
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isOng, setIsOng] = useState<boolean>(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUser(session.user);
+        supabase
+          .from("usuario")
+          .select("tipo")
+          .eq("id_usuario", session.user.id)
+          .maybeSingle()
+          .then(({ data, error }) => {
+            if (!error && data) {
+              setIsOng(data.tipo === "ong");
+            }
+          });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -224,12 +250,27 @@ export default function DonationsList({ initialDonations }: DonationsListProps) 
                   </div>
                 </div>
 
-                <button className="w-full flex items-center justify-center gap-2.5 py-3 rounded-2xl bg-secondary text-white font-bold hover:bg-secondary/90 active:scale-[0.98] transition-all shadow-sm cursor-pointer mt-2 text-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-                  </svg>
-                  Entrar em Contato
-                </button>
+                <div className="flex flex-col gap-2 w-full mt-2">
+                  {(!currentUser || isOng) ? (
+                    <button
+                      onClick={() => router.push(`/chat?doacao=${donation.id_doacao}`)}
+                      className="w-full flex items-center justify-center gap-2.5 py-3 rounded-2xl bg-secondary text-white font-bold hover:bg-secondary/90 active:scale-[0.98] transition-all shadow-sm cursor-pointer text-sm"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                      </svg>
+                      Entrar em Contato
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full flex items-center justify-center gap-2.5 py-3 rounded-2xl bg-surface-variant/25 border border-outline-variant/30 text-on-surface-variant/40 font-bold transition-all text-sm cursor-not-allowed"
+                      title="Apenas ONGs parceiras podem entrar em contato para resgatar doações"
+                    >
+                      Contato restrito a ONGs
+                    </button>
+                  )}
+                </div>
               </div>
             </article>
           ))}
